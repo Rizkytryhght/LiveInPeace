@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1064631648244",
+    "project_id": "liveinpeace-051823",
+    "storage_bucket": "liveinpeace-051823.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1064631648244:android:b6071e4d13300d32cec3a1",
+        "android_client_info": {
+          "package_name": "com.example.liveinpeace"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlYg6Cj3RuFyRbESAtVGLmy5gg1Qt2abk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

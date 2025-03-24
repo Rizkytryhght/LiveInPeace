@@ -1,18 +1,22 @@
 package com.example.liveinpeace.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.example.liveinpeace.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class AuthViewModel : ViewModel() {
-    private val _isLoggedIn = MutableStateFlow(false)
-    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
+    private val repository = AuthRepository()
 
-    fun login() {
-        _isLoggedIn.value = true
+    fun login(email: String, password: String, onComplete: (Boolean, String?) -> Unit) {
+        repository.login(email, password, onComplete)
     }
 
-    fun logout() {
-        _isLoggedIn.value = false
+    fun register(email: String, password: String, onComplete: (Boolean, String?) -> Unit) {
+        repository.register(email, password, onComplete)
+    }
+
+    fun resetPassword(email: String, onComplete: (Boolean, String?) -> Unit) {
+        repository.resetPassword(email, onComplete)
     }
 }
