@@ -74,4 +74,9 @@ dependencies {
 
     implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation ("com.google.android.material:material:1.9.0")
+    implementation ("io.github.chaosleung:pinview:1.4.4")
+
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
 }
