@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +24,7 @@ class AuthActivity : AppCompatActivity() {
         val emailField = findViewById<EditText>(R.id.emailEditText)
         val passwordField = findViewById<EditText>(R.id.passwordEditText)
         val loginButton = findViewById<Button>(R.id.loginButton)
+        val signUpTextView = findViewById<TextView>(R.id.signUpTextView)
 
         loginButton.setOnClickListener {
             val email = emailField.text.toString()
@@ -41,6 +43,11 @@ class AuthActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Email dan password harus diisi!", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        signUpTextView.setOnClickListener {
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
         }
     }
 }

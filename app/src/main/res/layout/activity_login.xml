@@ -86,7 +86,10 @@
             android:layout_height="wrap_content"
             android:text="Remember me"
             android:textSize="14sp"
-            android:textColor="#456687"/>
+            android:textColor="#456687"
+            android:minHeight="48dp"
+            android:padding="8dp"/>
+
 
         <Space
             android:layout_width="0dp"
