@@ -1,4 +1,4 @@
-package com.example.liveinpeace.viewmodel
+package com.example.liveinpeace.viewModel
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.liveinpeace.R
-import com.example.liveinpeace.viewmodel.AuthViewModel
+import com.example.liveinpeace.viewModel.AuthViewModel
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var viewModel: AuthViewModel

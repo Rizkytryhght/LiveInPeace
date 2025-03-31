@@ -9,8 +9,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.liveinpeace.data.ProfileModel
-import com.example.liveinpeace.viewmodel.ProfileViewModel
-//import com.example.liveinpeace.databinding.ActivityProfileBinding
+import com.example.liveinpeace.databinding.ActivityProfileBinding
+import com.example.liveinpeace.viewModel.ProfileViewModel
 import kotlinx.coroutines.launch
 
 class ProfileActivity : AppCompatActivity() {

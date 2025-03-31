@@ -1,9 +1,8 @@
-package com.example.liveinpeace.viewmodel
+package com.example.liveinpeace.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.liveinpeace.data.ProfileModel
-import com.example.liveinpeace.data.model.ProfileModel
 import com.example.liveinpeace.data.repository.ProfileRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

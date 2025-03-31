@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.liveinpeace.MainActivity
 import com.example.liveinpeace.R
-import com.example.liveinpeace.viewmodel.AuthViewModel
+import com.example.liveinpeace.viewModel.AuthViewModel
 
 class AuthActivity : AppCompatActivity() {
     private lateinit var viewModel: AuthViewModel

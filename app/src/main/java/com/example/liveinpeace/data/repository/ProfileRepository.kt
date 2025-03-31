@@ -3,7 +3,6 @@ package com.example.liveinpeace.data.repository
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.liveinpeace.data.ProfileModel
-import com.example.liveinpeace.data.model.ProfileModel
 
 class ProfileRepository(context: Context) {
     private val sharedPreferences: SharedPreferences =
@@ -13,7 +12,7 @@ class ProfileRepository(context: Context) {
         return ProfileModel(
             firstName = sharedPreferences.getString("first_name", "") ?: "",
             lastName = sharedPreferences.getString("last_name", "") ?: "",
-            profileImageUri = sharedPreferences.getString("profile_image", null)
+            profileImageUri = sharedPreferences.getString("profile_image", "") ?: ""
         )
     }
 

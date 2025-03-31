@@ -56,8 +56,8 @@
                     android:id="@+id/profileUsername"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@itunolua.kwa"
-                    android:textColor="#E0E0E0"
+                    android:text="itunolua.kwa"
+                    android:textColor="#B0B0B0"
                     android:textSize="14sp"/>
             </LinearLayout>
 
@@ -171,7 +171,7 @@
                         android:id="@+id/helpSupportOption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Help & Support"
+                        android:text="@string/help_support"
                         android:textSize="16sp"
                         android:textColor="#181D27"/>
                 </LinearLayout>

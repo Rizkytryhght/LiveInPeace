@@ -1,5 +1,6 @@
 package com.example.liveinpeace.viewModel
 
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import com.example.liveinpeace.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,5 +33,13 @@ class AuthViewModel : ViewModel() {
 
     fun resetPassword(email: String, onComplete: (Boolean, String?) -> Unit) {
         repository.resetPassword(email, onComplete)
+    }
+
+    fun sendOtp(phoneNumber: String, activity: Activity, onComplete: (Boolean, String?) -> Unit) {
+        repository.sendOtp(phoneNumber, activity, onComplete)
+    }
+
+    fun verifyOtp(otp: String, onComplete: (Boolean) -> Unit) {
+        repository.verifyOtp(otp, onComplete)
     }
 }
