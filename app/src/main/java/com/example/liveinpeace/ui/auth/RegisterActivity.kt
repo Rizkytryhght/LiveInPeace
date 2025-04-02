@@ -2,9 +2,11 @@ package com.example.liveinpeace.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -19,13 +21,20 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        viewModel = ViewModelProvider(this).get(AuthViewModel::class.java)
+        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
 
         val emailField = findViewById<EditText>(R.id.emailEditText)
         val passwordField = findViewById<EditText>(R.id.passwordEditText)
         val registerButton = findViewById<Button>(R.id.registerButton)
         val backButton = findViewById<ImageView>(R.id.backButton)
         val loginPromptTextView = findViewById<TextView>(R.id.loginPromptTextView)
+        val genderSpinner = findViewById<Spinner>(R.id.genderSpinner)
+        val genderOptions = resources.getStringArray(R.array.gender_options)
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            genderOptions
+        )
 
         // Event untuk tombol back
         backButton.setOnClickListener {
@@ -37,6 +46,11 @@ class RegisterActivity : AppCompatActivity() {
         registerButton.setOnClickListener {
             val email = emailField.text.toString()
             val password = passwordField.text.toString()
+            val selectedGender = genderSpinner.selectedItem.toString()
+            if (selectedGender == "Pilih Gender") {
+                Toast.makeText(this, "Silakan pilih gender!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 viewModel.register(email, password) { success, message ->
@@ -56,5 +70,8 @@ class RegisterActivity : AppCompatActivity() {
             startActivity(intent)
             finish() // Menutup halaman register agar tidak kembali ke sini saat menekan tombol back
         }
+
+        genderSpinner.adapter = adapter
+        genderSpinner.setSelection(0, false)
     }
 }

@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EFF0F6">
+    android:background="#EFF0F6"
+    android:descendantFocusability="blocksDescendants"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,7 +13,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Judul Profile -->
+        <!-- Profile Title -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -47,8 +49,8 @@
                     android:id="@+id/profileName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Itunuoluwa Abidoye"
-                    android:textColor="@android:color/white"
+                    android:text="Eren Yeager"
+                    android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold"/>
 
@@ -56,7 +58,7 @@
                     android:id="@+id/profileUsername"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="itunolua.kwa"
+                    android:text="E.Yeager"
                     android:textColor="#B0B0B0"
                     android:textSize="14sp"/>
             </LinearLayout>
@@ -76,7 +78,8 @@
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
             android:layout_marginTop="16dp"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:descendantFocusability="blocksDescendants">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -107,11 +110,13 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/logoutContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:paddingVertical="25dp">
+                    android:paddingVertical="10dp"
+                    android:background="#FFFFFF">
 
                     <ImageView
                         android:layout_width="24dp"
@@ -124,9 +129,12 @@
                         android:id="@+id/logoutOption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Log out"
+                        android:text="Logout"
                         android:textSize="16sp"
-                        android:textColor="#181D27"/>
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="16dp"
+                        android:background="?attr/selectableItemBackground" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>

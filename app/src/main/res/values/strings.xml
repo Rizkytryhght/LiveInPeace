@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">LiveInPeace</string>
     <string name="help_support">Help &amp; Support</string>
+    <string-array name="gender_options">
+        <item>Pilih Gender</item>
+        <item>Laki-laki</item>
+        <item>Perempuan</item>
+    </string-array>
 </resources>
