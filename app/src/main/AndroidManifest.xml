@@ -28,6 +28,8 @@
         <activity android:name=".ui.auth.ForgotPasswordActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".ui.profile.ProfileActivity" />
+        <activity android:name=".ui.note.NoteDetailActivity" />
+        <activity android:name=".ui.note.NoteActivity" />
     </application>
 
 </manifest>
