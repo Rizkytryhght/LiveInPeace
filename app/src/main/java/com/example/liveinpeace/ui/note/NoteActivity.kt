@@ -6,10 +6,13 @@ import android.os.Bundle
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.liveinpeace.R
 import com.example.liveinpeace.data.Note
+import com.example.liveinpeace.viewModel.NoteViewModel
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -20,88 +23,61 @@ class NoteActivity : AppCompatActivity() {
     private lateinit var searchEditText: EditText
     private lateinit var tagChipGroup: ChipGroup
     private lateinit var adapter: NoteAdapter
-    private var noteList = mutableListOf<Note>()
-    private var selectedTag: String = "Semua"
-    private lateinit var database: DatabaseReference
+    private lateinit var noteViewModel: NoteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note)
 
-        recyclerView = findViewById(R.id.noteRecyclerView)
+        recyclerView = findViewById(R.id.notesRecyclerView)
         searchEditText = findViewById(R.id.searchEditText)
-        tagChipGroup = findViewById(R.id.chipGroup)
+        tagChipGroup = findViewById(R.id.chipScrollView)
         val addNoteButton: FloatingActionButton = findViewById(R.id.addNoteButton)
 
-        // Initialize Firebase database
-        database = FirebaseDatabase.getInstance().reference.child("notes")
+        noteViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
 
-        adapter = NoteAdapter(noteList, object : NoteAdapter.OnItemClickListener {
+        adapter = NoteAdapter(mutableListOf(), object : NoteAdapter.OnItemClickListener {
             override fun onItemClick(note: Note) {
+                // Navigate to Edit
                 val intent = Intent(this@NoteActivity, NoteDetailActivity::class.java)
-                intent.putExtra("id", note.id)
-                intent.putExtra("title", note.title)
-                intent.putExtra("content", note.content)
-                intent.putExtra("date", note.date)
-                intent.putExtra("day", note.day)
-                intent.putExtra("tag", note.tag)
-                intent.putExtra("isNew", false)
-                startActivityForResult(intent, REQUEST_CODE_EDIT)
+                intent.putExtra("note_id", note.id)
+                startActivity(intent)
             }
         }, { note ->
-            // Implement delete function using Firebase
-            database.child(note.id).removeValue()
+            // Implement delete function
+            noteViewModel.deleteNote(note)
         })
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
-        // Load notes from Firebase
-        loadNotes()
+        // Observe the notes
+        noteViewModel.notes.observe(this, Observer {
+            adapter.updateList(it)
+        })
 
+        // Load notes
+        noteViewModel.loadNotes()
+
+        // Add new note
         addNoteButton.setOnClickListener {
             val intent = Intent(this, NoteDetailActivity::class.java)
-            intent.putExtra("isNew", true)
+            intent.putExtra("is_new", true)
             startActivityForResult(intent, REQUEST_CODE_ADD)
         }
 
         searchEditText.addTextChangedListener {
-            filterNotes(it.toString(), selectedTag)
+            filterNotes(it.toString())
         }
 
         setupChips()
     }
 
-    private fun loadNotes() {
-        database.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                noteList.clear()
-                for (noteSnapshot in snapshot.children) {
-                    val note = noteSnapshot.getValue(Note::class.java)
-                    if (note != null) {
-                        noteList.add(note)
-                    }
-                }
-                sortNotes()
-                adapter.notifyDataSetChanged()
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Handle error
-            }
-        })
-    }
-
-    private fun sortNotes() {
-        noteList.sortByDescending { it.date }
-    }
-
-    private fun filterNotes(query: String, tag: String) {
-        val filteredList = noteList.filter {
-            (it.title.contains(query, true) || it.content.contains(query, true)) &&
-                    (tag == "Semua" || it.tag == tag)
+    private fun filterNotes(query: String) {
+        val filteredList = noteViewModel.notes.value?.filter {
+            it.title.contains(query, true) || it.content.contains(query, true)
         }
-        adapter.updateList(filteredList) // Memperbarui daftar di adapter
+        adapter.updateList(filteredList ?: listOf())
     }
 
     private fun setupChips() {
@@ -112,13 +88,9 @@ class NoteActivity : AppCompatActivity() {
             val chip = Chip(this)
             chip.text = tag
             chip.isCheckable = true
-            chip.isChecked = tag == selectedTag
-
             chip.setOnClickListener {
-                selectedTag = tag
-                filterNotes(searchEditText.text.toString(), selectedTag)
+                filterNotes(searchEditText.text.toString())
             }
-
             tagChipGroup.addView(chip)
         }
     }
@@ -126,21 +98,19 @@ class NoteActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && data != null) {
-            val id = data.getStringExtra("id") ?: ""
+            val noteId = data.getStringExtra("id") ?: ""
             val title = data.getStringExtra("title") ?: ""
             val content = data.getStringExtra("content") ?: ""
             val date = data.getStringExtra("date") ?: ""
-            val day = data.getStringExtra("day") ?: ""
             val time = data.getStringExtra("time") ?: ""
             val tag = data.getStringExtra("tag") ?: ""
 
-            val note = Note(id, title, content, date, day, time, tag)
+            val note = Note(noteId, title, content, date, "Monday", time, tag)
+
             if (requestCode == REQUEST_CODE_ADD) {
-                // Add new note
-                database.child(id).setValue(note)
+                noteViewModel.addNote(note)
             } else if (requestCode == REQUEST_CODE_EDIT) {
-                // Update existing note
-                database.child(id).setValue(note)
+                noteViewModel.editNote(note)
             }
         }
     }

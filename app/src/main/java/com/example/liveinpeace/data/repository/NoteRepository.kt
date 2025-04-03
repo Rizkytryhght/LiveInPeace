@@ -10,9 +10,22 @@ class NoteRepository {
     private val notesCollection = firestore.collection("notes")
 
     // Insert a new note
+//    suspend fun insert(note: Note): Boolean {
+//        return try {
+//            // Set the note document using the note's id
+//            notesCollection.document(note.id).set(note).await()
+//            true
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            false
+//        }
+//    }
+
     suspend fun insert(note: Note): Boolean {
         return try {
-            // Set the note document using the note's id
+            if (note.id.isEmpty()) {
+                note.id = notesCollection.document().id // Buat ID otomatis jika kosong
+            }
             notesCollection.document(note.id).set(note).await()
             true
         } catch (e: Exception) {
@@ -66,4 +79,5 @@ class NoteRepository {
             emptyList()
         }
     }
+
 }
