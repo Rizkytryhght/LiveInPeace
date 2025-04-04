@@ -12,9 +12,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.liveinpeace.R
 import com.example.liveinpeace.data.Note
+import com.example.liveinpeace.data.repository.NoteRepository
 import com.example.liveinpeace.viewModel.NoteViewModel
+import com.example.liveinpeace.viewModel.NoteViewModelFactory
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -39,7 +43,13 @@ class NoteDetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_note_detail)
 
         // Initialize ViewModel
-        noteViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
+//        noteViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
+
+        val repository = NoteRepository()
+
+        // Gunakan ViewModelFactory untuk membuat instance ViewModel
+        val factory = NoteViewModelFactory(repository)
+        noteViewModel = ViewModelProvider(this, factory).get(NoteViewModel::class.java)
 
         initViews()
         setupCurrentDateTime()
@@ -153,10 +163,10 @@ class NoteDetailActivity : AppCompatActivity() {
         )
 
         if (isNewNote) {
-            noteViewModel.addNote(note)
+            noteViewModel.insertNote(note)
             Toast.makeText(this, "Catatan berhasil ditambahkan", Toast.LENGTH_SHORT).show()
         } else {
-            noteViewModel.editNote(note)
+            noteViewModel.updateNote(note)
             Toast.makeText(this, "Catatan berhasil diperbarui", Toast.LENGTH_SHORT).show()
         }
 
@@ -190,15 +200,17 @@ class NoteDetailActivity : AppCompatActivity() {
                 .setNegativeButton("Hapus") { _, _ ->
                     if (!isNewNote) {
                         // Only allow deletion of existing notes
-                        noteViewModel.deleteNote(Note(
-                            id = noteId,
-                            title = title,
-                            content = content,
-                            date = currentDate,
-                            day = currentDay,
-                            time = currentTime,
-                            tag = selectedTag
-                        ))
+                        noteViewModel.deleteNote(
+                            Note(
+                                id = noteId,
+                                title = title,
+                                content = content,
+                                date = currentDate,
+                                day = currentDay,
+                                time = currentTime,
+                                tag = selectedTag
+                            )
+                        )
                         Toast.makeText(this, "Catatan dihapus", Toast.LENGTH_SHORT).show()
                     }
                     finish()
@@ -212,11 +224,12 @@ class NoteDetailActivity : AppCompatActivity() {
             finish()
         }
     }
+}
 
 //    override fun onBackPressed() {
 //        showConfirmationDialog()
 //    }
-}
+
 
 
 

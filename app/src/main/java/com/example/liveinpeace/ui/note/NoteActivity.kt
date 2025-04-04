@@ -12,11 +12,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.liveinpeace.R
 import com.example.liveinpeace.data.Note
+import com.example.liveinpeace.data.repository.NoteRepository
 import com.example.liveinpeace.viewModel.NoteViewModel
+import com.example.liveinpeace.viewModel.NoteViewModelFactory
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.database.*
+//import com.google.firebase.database.*
 
 class NoteActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
@@ -24,6 +26,7 @@ class NoteActivity : AppCompatActivity() {
     private lateinit var tagChipGroup: ChipGroup
     private lateinit var adapter: NoteAdapter
     private lateinit var noteViewModel: NoteViewModel
+    private var allNotes = listOf<Note>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,33 +34,38 @@ class NoteActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.notesRecyclerView)
         searchEditText = findViewById(R.id.searchEditText)
-        tagChipGroup = findViewById(R.id.chipScrollView)
+        tagChipGroup = findViewById(R.id.chipGroup)
         val addNoteButton: FloatingActionButton = findViewById(R.id.addNoteButton)
 
-        noteViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
+        val repository = NoteRepository()
+        val viewModelFactory = NoteViewModelFactory(repository)
 
-        adapter = NoteAdapter(mutableListOf(), object : NoteAdapter.OnItemClickListener {
-            override fun onItemClick(note: Note) {
-                // Navigate to Edit
+        noteViewModel = ViewModelProvider(this, viewModelFactory)[NoteViewModel::class.java]
+
+        adapter = NoteAdapter(mutableListOf(),
+            { note -> // onClick
                 val intent = Intent(this@NoteActivity, NoteDetailActivity::class.java)
                 intent.putExtra("note_id", note.id)
-                startActivity(intent)
+                intent.putExtra("is_new", false)
+                startActivityForResult(intent, REQUEST_CODE_EDIT)
+            },
+            { note -> // onDelete
+                noteViewModel.deleteNote(note)
             }
-        }, { note ->
-            // Implement delete function
-            noteViewModel.deleteNote(note)
-        })
+        )
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
-        // Observe the notes
-        noteViewModel.notes.observe(this, Observer {
-            adapter.updateList(it)
-        })
+        loadNotes()
 
-        // Load notes
-        noteViewModel.loadNotes()
+//        // Observe the notes
+//        noteViewModel.notes.observe(this, Observer {
+//            adapter.updateList(it)
+//        })
+//
+//        // Load notes
+//        noteViewModel.loadNotes()
 
         // Add new note
         addNoteButton.setOnClickListener {
@@ -73,13 +81,28 @@ class NoteActivity : AppCompatActivity() {
         setupChips()
     }
 
-    private fun filterNotes(query: String) {
-        val filteredList = noteViewModel.notes.value?.filter {
-            it.title.contains(query, true) || it.content.contains(query, true)
+    private fun loadNotes() {
+        noteViewModel.getAllNotes().observe(this) { notes ->
+            allNotes = notes
+            adapter.updateList(notes)
         }
-        adapter.updateList(filteredList ?: listOf())
     }
 
+    private fun filterNotes(query: String) {
+        val filteredList = allNotes.filter {
+            it.title.contains(query, true) || it.content.contains(query, true)
+        }
+        adapter.updateList(filteredList)
+    }
+
+    private fun filterByTag(tag: String) {
+        if (tag == "Semua") {
+            adapter.updateList(allNotes)
+        } else {
+            val filteredList = allNotes.filter { it.tag == tag }
+            adapter.updateList(filteredList)
+        }
+    }
     private fun setupChips() {
         val tagList = listOf("Semua", "Motivasi", "Belajar", "Kerja")
         tagChipGroup.removeAllViews()
@@ -88,8 +111,21 @@ class NoteActivity : AppCompatActivity() {
             val chip = Chip(this)
             chip.text = tag
             chip.isCheckable = true
+
+            // Set first chip (Semua) as checked by default
+            if (tag == "Semua") {
+                chip.isChecked = true
+            }
+
             chip.setOnClickListener {
-                filterNotes(searchEditText.text.toString())
+                // Uncheck all other chips
+                for (i in 0 until tagChipGroup.childCount) {
+                    val c = tagChipGroup.getChildAt(i) as Chip
+                    if (c != chip) {
+                        c.isChecked = false
+                    }
+                }
+                filterByTag(tag)
             }
             tagChipGroup.addView(chip)
         }
@@ -108,10 +144,11 @@ class NoteActivity : AppCompatActivity() {
             val note = Note(noteId, title, content, date, "Monday", time, tag)
 
             if (requestCode == REQUEST_CODE_ADD) {
-                noteViewModel.addNote(note)
+                noteViewModel.insertNote(note)
             } else if (requestCode == REQUEST_CODE_EDIT) {
-                noteViewModel.editNote(note)
+                noteViewModel.updateNote(note)
             }
+            loadNotes()
         }
     }
 

@@ -5,24 +5,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.liveinpeace.R
 import com.example.liveinpeace.data.Note
 
 class NoteAdapter(
-    private val notes: MutableList<Note>, // Mutable list to allow modifications
-    private val itemClickListener: OnItemClickListener,
-    private val deleteClickListener: (Note) -> Unit
+    private var notes: List<Note>,
+    private val onItemClick: (Note) -> Unit,
+    private val onDeleteClick: (Note) -> Unit
 ) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
 
     class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleTextView: TextView = itemView.findViewById(R.id.noteTitleTextView)
         val timeTextView: TextView = itemView.findViewById(R.id.noteTimeTextView)
         val deleteButton: ImageView = itemView.findViewById(R.id.deleteNoteButton)
-    }
-
-    interface OnItemClickListener {
-        fun onItemClick(note: Note)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
@@ -35,24 +32,89 @@ class NoteAdapter(
         holder.titleTextView.text = note.title
         holder.timeTextView.text = note.time
 
-        holder.itemView.setOnClickListener {
-            itemClickListener.onItemClick(note)
-        }
-
-        holder.deleteButton.setOnClickListener {
-            deleteClickListener(note) // Call delete function
-        }
+        holder.itemView.setOnClickListener { onItemClick(note) }
+        holder.deleteButton.setOnClickListener { onDeleteClick(note) }
     }
 
     override fun getItemCount(): Int = notes.size
 
-    // Function to update the note list
     fun updateList(newNotes: List<Note>) {
-        notes.clear()
-        notes.addAll(newNotes)
-        notifyDataSetChanged()  // Notify adapter that data has changed
+        val diffCallback = NoteDiffCallback(notes, newNotes)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+        notes = newNotes
+        diffResult.dispatchUpdatesTo(this)  // Memastikan perubahan lebih halus
+    }
+
+    class NoteDiffCallback(private val oldList: List<Note>, private val newList: List<Note>) :
+        DiffUtil.Callback() {
+        override fun getOldListSize() = oldList.size
+        override fun getNewListSize() = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].id == newList[newItemPosition].id
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition] == newList[newItemPosition]
+        }
     }
 }
+
+
+//import android.view.LayoutInflater
+//import android.view.View
+//import android.view.ViewGroup
+//import android.widget.ImageView
+//import android.widget.TextView
+//import androidx.recyclerview.widget.RecyclerView
+//import com.example.liveinpeace.R
+//import com.example.liveinpeace.data.Note
+//
+//class NoteAdapter(
+//    private val notes: MutableList<Note>, // Mutable list to allow modifications
+//    private val itemClickListener: OnItemClickListener,
+//    private val deleteClickListener: (Note) -> Unit
+//) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
+//
+//    class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+//        val titleTextView: TextView = itemView.findViewById(R.id.noteTitleTextView)
+//        val timeTextView: TextView = itemView.findViewById(R.id.noteTimeTextView)
+//        val deleteButton: ImageView = itemView.findViewById(R.id.deleteNoteButton)
+//    }
+//
+//    interface OnItemClickListener {
+//        fun onItemClick(note: Note)
+//    }
+//
+//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
+//        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_note, parent, false)
+//        return NoteViewHolder(view)
+//    }
+//
+//    override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
+//        val note = notes[position]
+//        holder.titleTextView.text = note.title
+//        holder.timeTextView.text = note.time
+//
+//        holder.itemView.setOnClickListener {
+//            itemClickListener.onItemClick(note)
+//        }
+//
+//        holder.deleteButton.setOnClickListener {
+//            deleteClickListener(note) // Call delete function
+//        }
+//    }
+//
+//    override fun getItemCount(): Int = notes.size
+//
+//    // Function to update the note list
+//    fun updateList(newNotes: List<Note>) {
+//        notes.clear()
+//        notes.addAll(newNotes)
+//        notifyDataSetChanged()  // Notify adapter that data has changed
+//    }
+//}
 
 
 

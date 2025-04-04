@@ -58,53 +58,63 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/searchCardView">
 
-        <LinearLayout
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            app:singleSelection="true"
+            android:textColor="#2E7D32"
+            app:chipBackgroundColor="#FFFFFF"
+            app:chipStrokeColor="#2E7D32">
+    </com.google.android.material.chip.ChipGroup>
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipAll"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="Semua"
-                android:textColor="#2E7D32"
-                app:chipBackgroundColor="#FFFFFF"
-                app:chipStrokeColor="#2E7D32"
-                app:chipStrokeWidth="1dp" />
+        <!--        <LinearLayout-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal">-->
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipMotivation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="Motivasi"
-                android:textColor="#2E7D32"
-                app:chipBackgroundColor="#ffffff"
-                app:chipStrokeColor="#2E7D32"/>
+<!--            <com.google.android.material.chip.Chip-->
+<!--                android:id="@+id/chipAll"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:text="Semua"-->
+<!--                android:textColor="#2E7D32"-->
+<!--                app:chipBackgroundColor="#FFFFFF"-->
+<!--                app:chipStrokeColor="#2E7D32"-->
+<!--                app:chipStrokeWidth="1dp" />-->
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipStudy"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="Belajar"
-                android:textColor="#2E7D32"
-                app:chipBackgroundColor="#FFFFFF"
-                app:chipStrokeColor="#2E7D32"
-                app:chipStrokeWidth="1dp" />
+<!--            <com.google.android.material.chip.Chip-->
+<!--                android:id="@+id/chipMotivation"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:text="Motivasi"-->
+<!--                android:textColor="#2E7D32"-->
+<!--                app:chipBackgroundColor="#ffffff"-->
+<!--                app:chipStrokeColor="#2E7D32"/>-->
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipWork"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Kerja"
-                android:textColor="#2E7D32"
-                app:chipBackgroundColor="#FFFFFF"
-                app:chipStrokeColor="#2E7D32"
-                app:chipStrokeWidth="1dp" />
-        </LinearLayout>
+<!--            <com.google.android.material.chip.Chip-->
+<!--                android:id="@+id/chipStudy"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginEnd="8dp"-->
+<!--                android:text="Belajar"-->
+<!--                android:textColor="#2E7D32"-->
+<!--                app:chipBackgroundColor="#FFFFFF"-->
+<!--                app:chipStrokeColor="#2E7D32"-->
+<!--                app:chipStrokeWidth="1dp" />-->
+
+<!--            <com.google.android.material.chip.Chip-->
+<!--                android:id="@+id/chipWork"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Kerja"-->
+<!--                android:textColor="#2E7D32"-->
+<!--                app:chipBackgroundColor="#FFFFFF"-->
+<!--                app:chipStrokeColor="#2E7D32"-->
+<!--                app:chipStrokeWidth="1dp" />-->
+<!--        </LinearLayout>-->
     </HorizontalScrollView>
 
     <androidx.recyclerview.widget.RecyclerView
