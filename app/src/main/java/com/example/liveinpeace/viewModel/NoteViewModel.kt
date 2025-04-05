@@ -8,13 +8,31 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.example.liveinpeace.data.Note
 import com.example.liveinpeace.data.repository.NoteRepository
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.launch
 
 class NoteViewModel(private val repository: NoteRepository) : ViewModel() {
 
-//    val allNotes: LiveData<List<Note>> = repository.getAllNotes()
+    private val _realtimeNotes = MutableLiveData<List<Note>>()
+    val realtimeNotes: LiveData<List<Note>> get() = _realtimeNotes
+
+    private var notesListener: ListenerRegistration? = null
+
+    init {
+        startListeningToNotes()
+    }
+
+    private fun startListeningToNotes() {
+        notesListener = repository.listenToNotes { updatedNotes ->
+            _realtimeNotes.postValue(updatedNotes)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Hentikan listener saat ViewModel dihancurkan
+        notesListener?.remove()
+    }
 
     fun insertNote(note: Note) = viewModelScope.launch {
         repository.insert(note)
@@ -46,53 +64,3 @@ class NoteViewModelFactory(private val repository: NoteRepository) : ViewModelPr
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-
-//class NoteViewModel : ViewModel() {
-//
-//    private val _notes = MutableLiveData<List<Note>>()
-//    val notes: LiveData<List<Note>> = _notes
-//
-//    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-//    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("notes")
-//
-//    init {
-//        loadNotes()
-//    }
-//
-//    fun addNote(note: Note) {
-//        val userId = auth.currentUser?.uid ?: return
-//        val newNoteId = database.child(userId).push().key ?: return
-//        val newNote = note.copy(id = newNoteId)
-//        database.child(userId).child(newNoteId).setValue(newNote)
-//    }
-//
-//    fun editNote(note: Note) {
-//        val userId = auth.currentUser?.uid ?: return
-//        database.child(userId).child(note.id).setValue(note)
-//    }
-//
-//    fun deleteNote(note: Note) {
-//        val userId = auth.currentUser?.uid ?: return
-//        database.child(userId).child(note.id).removeValue()
-//    }
-//
-//    fun loadNotes() {
-//        val userId = auth.currentUser?.uid ?: return
-//        database.child(userId).addValueEventListener(object : ValueEventListener {
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                val noteList = mutableListOf<Note>()
-//                for (noteSnapshot in snapshot.children) {
-//                    val note = noteSnapshot.getValue(Note::class.java)
-//                    if (note != null) {
-//                        noteList.add(note)
-//                    }
-//                }
-//                _notes.value = noteList
-//            }
-//
-//            override fun onCancelled(error: DatabaseError) {
-//                // Log error saat Firebase gagal membaca data
-//            }
-//        })
-//    }
-//}

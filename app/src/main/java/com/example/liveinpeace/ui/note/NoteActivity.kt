@@ -57,7 +57,7 @@ class NoteActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
-        loadNotes()
+        observeRealtimeNotes()
 
         addNoteButton.setOnClickListener {
             val intent = Intent(this, NoteDetailActivity::class.java)
@@ -92,10 +92,11 @@ class NoteActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadNotes() {
-        noteViewModel.getAllNotes().observe(this) { notes ->
+    private fun observeRealtimeNotes() {
+        noteViewModel.realtimeNotes.observe(this) { notes ->
             allNotes = notes
-            adapter.updateList(notes)
+            val sortedNotes = notes.sortedByDescending { it.date + it.time } // urutkan berdasarkan waktu
+            adapter.updateList(sortedNotes)
         }
     }
 
@@ -158,7 +159,7 @@ class NoteActivity : AppCompatActivity() {
             } else if (requestCode == REQUEST_CODE_EDIT) {
                 noteViewModel.updateNote(note)
             }
-            loadNotes()
+            observeRealtimeNotes()
         }
     }
 
