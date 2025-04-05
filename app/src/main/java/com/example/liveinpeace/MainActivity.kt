@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.liveinpeace.ui.auth.AuthActivity
-//import com.example.liveinpeace.ui.profile.ProfileActivity
+import com.example.liveinpeace.ui.profile.ProfileActivity
 import com.example.liveinpeace.ui.note.NoteActivity
 import com.google.firebase.auth.FirebaseAuth
 

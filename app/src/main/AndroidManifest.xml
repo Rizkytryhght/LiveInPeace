@@ -7,29 +7,29 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/liveinpeace"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/liveinpeace"
         android:supportsRtl="true"
         android:theme="@style/Theme.LiveInPeace"
         tools:targetApi="31">
         <activity
-            android:name=".ui.auth.AuthActivity"
+            android:name=".SplashActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.LiveInPeace">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".ui.auth.RegisterActivity" />
         <activity android:name=".ui.auth.ForgotPasswordActivity" />
         <activity android:name=".MainActivity" />
-<!--        <activity android:name=".ui.profile.ProfileActivity" />-->
+        <activity android:name=".ui.profile.ProfileActivity" />
         <activity android:name=".ui.note.NoteDetailActivity" />
         <activity android:name=".ui.note.NoteActivity" />
+        <activity android:name=".ui.auth.AuthActivity"/>
     </application>
 
 </manifest>

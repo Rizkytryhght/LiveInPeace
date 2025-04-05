@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LiveInPeace</string>
+    <string name="app_name">Live In Peace</string>
     <string name="help_support">Help &amp; Support</string>
     <string-array name="gender_options">
         <item>Pilih Gender</item>
