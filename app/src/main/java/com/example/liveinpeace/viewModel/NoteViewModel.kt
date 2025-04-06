@@ -23,8 +23,10 @@ class NoteViewModel(private val repository: NoteRepository) : ViewModel() {
     }
 
     private fun startListeningToNotes() {
-        notesListener = repository.listenToNotes { updatedNotes ->
+        repository.listenToNotes { updatedNotes ->
             _realtimeNotes.postValue(updatedNotes)
+        }?.let {
+            notesListener = it
         }
     }
 

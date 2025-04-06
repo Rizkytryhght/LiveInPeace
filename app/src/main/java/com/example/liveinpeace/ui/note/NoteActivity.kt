@@ -46,6 +46,11 @@ class NoteActivity : AppCompatActivity() {
             { note ->
                 val intent = Intent(this@NoteActivity, NoteDetailActivity::class.java)
                 intent.putExtra("note_id", note.id)
+                intent.putExtra("title", note.title)
+                intent.putExtra("content", note.content)
+                intent.putExtra("tag", note.tag)
+                intent.putExtra("date", note.date)
+                intent.putExtra("time", note.time)
                 intent.putExtra("is_new", false)
                 startActivityForResult(intent, REQUEST_CODE_EDIT)
             },
@@ -142,6 +147,7 @@ class NoteActivity : AppCompatActivity() {
         }
     }
 
+    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && data != null) {
@@ -152,7 +158,7 @@ class NoteActivity : AppCompatActivity() {
             val time = data.getStringExtra("time") ?: ""
             val tag = data.getStringExtra("tag") ?: ""
 
-            val note = Note(noteId, title, content, date, "Monday", time, tag)
+            val note = Note(noteId, title, content, date, time, tag)
 
             if (requestCode == REQUEST_CODE_ADD) {
                 noteViewModel.insertNote(note)

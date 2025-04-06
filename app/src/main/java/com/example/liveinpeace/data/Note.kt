@@ -1,22 +1,13 @@
 package com.example.liveinpeace.data
 
+import com.google.firebase.firestore.IgnoreExtraProperties
+
+@IgnoreExtraProperties
 data class Note(
-    var id: String = "", // Ubah dari `val` ke `var`
+    var id: String = "",
     val title: String = "",
     val content: String = "",
     val date: String = "",
-    val day: String = "",
     val time: String = "",
     val tag: String = "Semua"
 )
-
-
-//data class Note(
-//    val id: String,
-//    val title: String,
-//    val content: String,
-//    val date: String,
-//    val day: String,
-//    val time: String,
-//    val tag: String,
-//)

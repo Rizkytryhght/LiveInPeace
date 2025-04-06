@@ -1,13 +1,10 @@
 package com.example.liveinpeace.ui.note
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.liveinpeace.R
@@ -17,8 +14,6 @@ import com.example.liveinpeace.viewModel.NoteViewModel
 import com.example.liveinpeace.viewModel.NoteViewModelFactory
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -35,51 +30,44 @@ class NoteDetailActivity : AppCompatActivity() {
     private var noteId = ""
     private var selectedTag = "Semua"
     private var currentDate = ""
-    private var currentDay = ""
     private var currentTime = ""
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_note_detail)
 
-        // Initialize ViewModel
-//        noteViewModel = ViewModelProvider(this).get(NoteViewModel::class.java)
-
         val repository = NoteRepository()
-
-        // Gunakan ViewModelFactory untuk membuat instance ViewModel
         val factory = NoteViewModelFactory(repository)
-        noteViewModel = ViewModelProvider(this, factory).get(NoteViewModel::class.java)
+        noteViewModel = ViewModelProvider(this, factory)[NoteViewModel::class.java]
 
         initViews()
-        setupCurrentDateTime()
         setupChips()
         setupBackButton()
         setupSaveButton()
 
-        // Get data from intent
         isNewNote = intent.getBooleanExtra("is_new", true)
 
         if (!isNewNote) {
-            // Editing existing note
-            noteId = intent.getStringExtra("note_id") ?: ""
+            noteId = intent.getStringExtra("note_id") ?: UUID.randomUUID().toString()
             titleEditText.setText(intent.getStringExtra("title"))
             contentEditText.setText(intent.getStringExtra("content"))
             selectedTag = intent.getStringExtra("tag") ?: "Semua"
 
-            // If date and time were passed, use them instead of current
-            val passedDate = intent.getStringExtra("date")
-            if (!passedDate.isNullOrEmpty()) {
-                currentDate = passedDate
-                currentDay = intent.getStringExtra("day") ?: currentDay
-                currentTime = intent.getStringExtra("time") ?: currentTime
-                dateTextView.text = "$currentDate $currentDay"
+            currentDate = intent.getStringExtra("date") ?: ""
+            currentTime = intent.getStringExtra("time") ?: ""
+
+            // Jika data kosong, generate ulang
+            if (currentDate.isEmpty() || currentTime.isEmpty()) {
+                setupCurrentDateTime()
             }
 
+            dateTextView.text = getDisplayDate()
             updateChipsSelection(selectedTag)
         } else {
-            // Generate a temporary ID for new note
             noteId = UUID.randomUUID().toString()
+            setupCurrentDateTime()
+            dateTextView.text = getDisplayDate()
         }
     }
 
@@ -90,19 +78,6 @@ class NoteDetailActivity : AppCompatActivity() {
         contentEditText = findViewById(R.id.contentEditText)
         dateTextView = findViewById(R.id.dateTextView)
         tagChipGroup = findViewById(R.id.tagChipGroup)
-    }
-
-    private fun setupCurrentDateTime() {
-        val calendar = Calendar.getInstance()
-        val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        val dayFormat = SimpleDateFormat("EEEE", Locale("in", "ID"))
-        val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
-
-        currentDate = dateFormat.format(calendar.time)
-        currentDay = dayFormat.format(calendar.time).uppercase()
-        currentTime = timeFormat.format(calendar.time)
-
-        dateTextView.text = "$currentDate $currentDay"
     }
 
     private fun setupChips() {
@@ -128,6 +103,31 @@ class NoteDetailActivity : AppCompatActivity() {
         for (i in 0 until tagChipGroup.childCount) {
             val chip = tagChipGroup.getChildAt(i) as Chip
             chip.isChecked = chip.text == selectedTag
+        }
+    }
+
+    private fun setupCurrentDateTime() {
+        val calendar = Calendar.getInstance()
+        val rawDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val timeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+
+        val now = calendar.time
+        currentDate = rawDateFormat.format(now)
+        currentTime = timeFormat.format(now)
+    }
+
+    private fun getDisplayDate(): String {
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val date = inputFormat.parse(currentDate)
+
+            val displayDate = SimpleDateFormat("dd MMM yyyy", Locale("id", "ID")).format(date ?: Date())
+            val dayName = SimpleDateFormat("EEEE", Locale("id", "ID")).format(date ?: Date())
+            val timeDisplay = currentTime // misal: 11:15 AM
+
+            "$displayDate ($dayName), $timeDisplay"
+        } catch (e: Exception) {
+            currentDate
         }
     }
 
@@ -157,7 +157,6 @@ class NoteDetailActivity : AppCompatActivity() {
             title = title,
             content = content,
             date = currentDate,
-            day = currentDay,
             time = currentTime,
             tag = selectedTag
         )
@@ -170,220 +169,41 @@ class NoteDetailActivity : AppCompatActivity() {
             Toast.makeText(this, "Catatan berhasil diperbarui", Toast.LENGTH_SHORT).show()
         }
 
-        // Return result to calling activity
-        val resultIntent = Intent()
-        resultIntent.putExtra("id", noteId)
-        resultIntent.putExtra("title", title)
-        resultIntent.putExtra("content", content)
-        resultIntent.putExtra("date", currentDate)
-        resultIntent.putExtra("day", currentDay)
-        resultIntent.putExtra("time", currentTime)
-        resultIntent.putExtra("tag", selectedTag)
-
+        val resultIntent = Intent().apply {
+            putExtra("id", note.id)
+            putExtra("title", note.title)
+            putExtra("content", note.content)
+            putExtra("date", note.date)
+            putExtra("time", note.time)
+            putExtra("tag", note.tag)
+        }
         setResult(RESULT_OK, resultIntent)
         finish()
     }
 
     private fun showConfirmationDialog() {
-        val dialogBuilder = AlertDialog.Builder(this)
-
         val title = titleEditText.text.toString().trim()
         val content = contentEditText.text.toString().trim()
 
-        // Check if anything has been entered
         if (title.isNotEmpty() || content.isNotEmpty()) {
-            dialogBuilder.setTitle("Konfirmasi")
+            AlertDialog.Builder(this)
+                .setTitle("Konfirmasi")
                 .setMessage("Apakah anda ingin menyimpan perubahan?")
-                .setPositiveButton("Simpan") { _, _ ->
-                    saveNote()
-                }
+                .setPositiveButton("Simpan") { _, _ -> saveNote() }
                 .setNegativeButton("Hapus") { _, _ ->
                     if (!isNewNote) {
-                        // Only allow deletion of existing notes
                         noteViewModel.deleteNote(
-                            Note(
-                                id = noteId,
-                                title = title,
-                                content = content,
-                                date = currentDate,
-                                day = currentDay,
-                                time = currentTime,
-                                tag = selectedTag
-                            )
+                            Note(id = noteId, title = title, content = content, date = currentDate, time = currentTime, tag = selectedTag)
                         )
                         Toast.makeText(this, "Catatan dihapus", Toast.LENGTH_SHORT).show()
                     }
                     finish()
                 }
-                .setNeutralButton("Batal") { dialog, _ ->
-                    dialog.dismiss()
-                }
-            dialogBuilder.create().show()
+                .setNeutralButton("Batal") { dialog, _ -> dialog.dismiss() }
+                .create()
+                .show()
         } else {
-            // Nothing entered, just go back
             finish()
         }
     }
 }
-
-//    override fun onBackPressed() {
-//        showConfirmationDialog()
-//    }
-
-
-
-
-
-//import android.app.AlertDialog
-//import android.content.Intent
-//import android.os.Bundle
-//import android.widget.Button
-//import android.widget.EditText
-//import android.widget.ImageButton
-//import android.widget.TextView
-//import androidx.appcompat.app.AppCompatActivity
-//import com.example.liveinpeace.R
-//import com.google.android.material.chip.Chip
-//import com.google.android.material.chip.ChipGroup
-//import java.text.SimpleDateFormat
-//import java.util.Date
-//import java.util.Locale
-//
-//class NoteDetailActivity : AppCompatActivity() {
-//    private lateinit var backButton: ImageButton
-//    private lateinit var saveButton: Button
-//    private lateinit var titleEditText: EditText
-//    private lateinit var contentEditText: EditText
-//    private lateinit var dateTextView: TextView
-//    private lateinit var tagChipGroup: ChipGroup
-//    private var isNewNote = false
-//    private var noteId = ""
-//    private var selectedTag = "Semua"
-//
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContentView(R.layout.activity_note_detail)
-//
-//        initViews()
-//        setupCurrentDate()
-//        setupChips()
-//        setupBackButton()
-//        setupSaveButton()
-//
-//        isNewNote = intent.getBooleanExtra("is_new", false)
-//
-//        if (!isNewNote) {
-//            noteId = intent.getStringExtra("note_id") ?: ""
-//            titleEditText.setText(intent.getStringExtra("note_title"))
-//            contentEditText.setText(intent.getStringExtra("note_content"))
-//            selectedTag = intent.getStringExtra("note_tag") ?: "Semua"
-//            updateChipsSelection(selectedTag)
-//        }
-//    }
-//
-//    private fun initViews() {
-//        backButton = findViewById(R.id.backButton)
-//        saveButton = findViewById(R.id.saveButton)
-//        titleEditText = findViewById(R.id.titleEditText)
-//        contentEditText = findViewById(R.id.contentEditText)
-//        dateTextView = findViewById(R.id.dateTextView)
-//        tagChipGroup = findViewById(R.id.tagChipGroup)
-//    }
-//
-//    private fun setupCurrentDate() {
-//        val date = Date()
-//        val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-//        val dayFormat = SimpleDateFormat("EEEE", Locale("in", "ID")).format(date).uppercase()
-//        dateTextView.text = "${dateFormat.format(date)} $dayFormat"
-//    }
-//
-//    private fun setupChips() {
-//        val tagList = listOf("Semua", "Motivasi", "Belajar", "Kerja")
-//
-//        tagChipGroup.removeAllViews()
-//
-//        tagList.forEach { tag ->
-//            val chip = Chip(this)
-//            chip.text = tag
-//            chip.isCheckable = true
-//            chip.isChecked = tag == selectedTag
-//
-//            chip.setOnClickListener {
-//                selectedTag = tag
-//                updateChipsSelection(tag)
-//            }
-//
-//            tagChipGroup.addView(chip)
-//        }
-//    }
-//
-//    private fun updateChipsSelection(selectedTag: String) {
-//        for (i in 0 until tagChipGroup.childCount) {
-//            val chip = tagChipGroup.getChildAt(i) as Chip
-//            chip.isChecked = chip.text == selectedTag
-//        }
-//    }
-//
-//    private fun setupBackButton() {
-//        backButton.setOnClickListener {
-//            showConfirmationDialog()
-//        }
-//    }
-//
-//    private fun setupSaveButton() {
-//        saveButton.setOnClickListener {
-//            val title = titleEditText.text.toString()
-//            val content = contentEditText.text.toString()
-//
-//            if (title.isNotEmpty()) {
-//                val resultIntent = Intent()
-//                resultIntent.putExtra("is_new", isNewNote)
-//                resultIntent.putExtra("note_id", noteId)
-//                resultIntent.putExtra("note_title", title)
-//                resultIntent.putExtra("note_content", content)
-//                resultIntent.putExtra("note_tag", selectedTag)
-//
-//                setResult(RESULT_OK, resultIntent)
-//                finish()
-//            } else {
-//                titleEditText.error = "Judul tidak boleh kosong"
-//            }
-//        }
-//    }
-//
-//    private fun showConfirmationDialog() {
-//        val dialogBuilder = AlertDialog.Builder(this)
-//
-//        if (!isNewNote) {
-//            dialogBuilder.setTitle("Konfirmasi")
-//                .setMessage("Apakah anda ingin menyimpan perubahan?")
-//                .setPositiveButton("Simpan") { _, _ ->
-//                    saveButton.performClick()
-//                }
-//                .setNegativeButton("Hapus") { _, _ ->
-//                    val resultIntent = Intent()
-//                    resultIntent.putExtra("note_id", noteId)
-//                    setResult(2, resultIntent) // 2 for delete
-//                    finish()
-//                }
-//                .setNeutralButton("Batal") { dialog, _ ->
-//                    dialog.dismiss()
-//                }
-//        } else {
-//            dialogBuilder.setTitle("Konfirmasi")
-//                .setMessage("Apakah anda ingin menyimpan catatan ini?")
-//                .setPositiveButton("Simpan") { _, _ ->
-//                    saveButton.performClick()
-//                }
-//                .setNegativeButton("Batal") { _, _ ->
-//                    finish()
-//                }
-//        }
-//
-//        dialogBuilder.create().show()
-//    }
-//}
-
-//    override fun onBackPressed() {
-//        showConfirmationDialog()
-//    }
