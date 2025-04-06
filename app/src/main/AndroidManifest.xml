@@ -30,6 +30,8 @@
         <activity android:name=".ui.note.NoteDetailActivity" />
         <activity android:name=".ui.note.NoteActivity" />
         <activity android:name=".ui.auth.AuthActivity"/>
+        <activity android:name=".ui.features.FeatureListActivity"/>
+        <activity android:name=".ui.home.HomeActivity"/>
     </application>
 
 </manifest>
