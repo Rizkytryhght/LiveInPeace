@@ -3,7 +3,9 @@ package com.example.liveinpeace.ui.features
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import com.example.liveinpeace.R
+import com.example.liveinpeace.ui.checklist.ChecklistIbadahActivity
 import com.example.liveinpeace.ui.home.HomeActivity
 import com.example.liveinpeace.ui.note.NoteActivity
 import com.example.liveinpeace.ui.profile.ProfileActivity
@@ -14,6 +16,14 @@ class FeatureListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feature_list)
 
+        // Card Checklist Ibadah
+        val cardChecklistIbadah = findViewById<CardView>(R.id.cardChecklistIbadah)
+        cardChecklistIbadah.setOnClickListener {
+            val intent = Intent(this, ChecklistIbadahActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Bottom Navigation
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.selectedItemId = R.id.nav_features
 
