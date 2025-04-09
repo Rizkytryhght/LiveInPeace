@@ -9,6 +9,7 @@ import com.example.liveinpeace.ui.checklist.ChecklistIbadahActivity
 import com.example.liveinpeace.ui.home.HomeActivity
 import com.example.liveinpeace.ui.note.NoteActivity
 import com.example.liveinpeace.ui.profile.ProfileActivity
+import com.example.liveinpeace.ui.reminder.ReminderActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class FeatureListActivity : AppCompatActivity() {
@@ -20,6 +21,12 @@ class FeatureListActivity : AppCompatActivity() {
         val cardChecklistIbadah = findViewById<CardView>(R.id.cardChecklistIbadah)
         cardChecklistIbadah.setOnClickListener {
             val intent = Intent(this, ChecklistIbadahActivity::class.java)
+            startActivity(intent)
+        }
+
+        val reminderCard = findViewById<CardView>(R.id.reminderCard)
+        reminderCard.setOnClickListener {
+            val intent = Intent(this, ReminderActivity::class.java)
             startActivity(intent)
         }
 
