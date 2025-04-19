@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.concurrent.TimeUnit
 
 class AuthRepository {
@@ -24,12 +25,36 @@ class AuthRepository {
             }
     }
 
-    fun register(email: String, password: String, onComplete: (Boolean, String?) -> Unit) {
+    fun register(email: String, password: String, firstName: String, lastName: String, onComplete: (Boolean, String?) -> Unit) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    onComplete(true, null)
-                } else {
+                    val user = auth.currentUser
+                    val uid = user?.uid
+//                    onComplete(true, null)
+
+                    if (uid != null) {
+                        val db = FirebaseFirestore.getInstance()
+                        val userMap = hashMapOf(
+                            "firstName" to firstName,
+                            "lastName" to lastName,
+                            "email" to email
+                        )
+
+                        db.collection("users").document(uid).set(userMap)
+                            .addOnSuccessListener {
+                                onComplete(true, null)
+                            }
+                            .addOnFailureListener { e ->
+                                onComplete(
+                                    false,
+                                    "Registrasi berhasil, tapi gagal simpan data: ${e.message}"
+                                )
+                            }
+                    } else {
+                        onComplete(false, "Registrasi berhasil, tapi user tidak ditemukan.")
+                    }
+                }else{
                     onComplete(false, task.exception?.message)
                 }
             }
