@@ -23,6 +23,8 @@ class RegisterActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
 
+        val firstNameField = findViewById<EditText>(R.id.firstNameEditText)
+        val lastNameField = findViewById<EditText>(R.id.lastNameEditText)
         val emailField = findViewById<EditText>(R.id.emailEditText)
         val passwordField = findViewById<EditText>(R.id.passwordEditText)
         val registerButton = findViewById<Button>(R.id.registerButton)
@@ -44,6 +46,8 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         registerButton.setOnClickListener {
+            val firstName = firstNameField.text.toString()
+            val lastName = lastNameField.text.toString()
             val email = emailField.text.toString()
             val password = passwordField.text.toString()
             val selectedGender = genderSpinner.selectedItem.toString()
@@ -52,8 +56,8 @@ class RegisterActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                viewModel.register(email, password) { success, message ->
+            if (email.isNotEmpty() && password.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty()) {
+                viewModel.register(email, password, firstName, lastName) { success, message ->
                     if (success) {
                         Toast.makeText(this, "Registrasi berhasil!", Toast.LENGTH_SHORT).show()
                         finish() // Kembali ke login
@@ -62,7 +66,7 @@ class RegisterActivity : AppCompatActivity() {
                     }
                 }
             } else {
-                Toast.makeText(this, "Email dan password harus diisi!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Semua data harus diisi!", Toast.LENGTH_SHORT).show()
             }
         }
         loginPromptTextView.setOnClickListener {
