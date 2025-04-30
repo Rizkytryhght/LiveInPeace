@@ -1,0 +1,58 @@
+<LinearLayout android:id="@+id/moodTrackerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/questionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bagaimana mood kamu hari ini?"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/black" />
+
+    <RadioGroup
+        android:id="@+id/moodRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <RadioButton
+            android:id="@+id/moodHappy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Senang" />
+
+        <RadioButton
+            android:id="@+id/moodSad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sedih" />
+
+        <RadioButton
+            android:id="@+id/moodAnxious"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cemas" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/saveMoodButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Simpan Mood"
+        android:layout_marginTop="12dp" />
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/moodBarChart"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        />
+
+</LinearLayout>

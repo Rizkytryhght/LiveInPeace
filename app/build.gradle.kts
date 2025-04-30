@@ -2,9 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("org.jetbrains.kotlin.kapt")
-    id("com.google.gms.google-services")
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.google.services) // ✅ Ganti dari id("...")
 }
+
 
 android {
     namespace = "com.example.liveinpeace"
@@ -30,11 +31,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "21"
     }
     buildFeatures {
         compose = true
@@ -78,11 +79,16 @@ dependencies {
     implementation ("io.github.chaosleung:pinview:1.4.4")
 
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
     implementation ("de.hdodenhof:circleimageview:3.1.0")
 
     implementation ("androidx.cardview:cardview:1.0.0")
     implementation ("androidx.recyclerview:recyclerview:1.2.1")
     implementation ("com.google.firebase:firebase-firestore-ktx:24.0.0")
-    implementation (platform("com.google.firebase:firebase-bom:32.0.0"))
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+
+    implementation(libs.mpandroidchart)
+
 }
