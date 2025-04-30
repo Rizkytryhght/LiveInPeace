@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Layer 1: Garis tepi hijau (selalu terlihat) -->
+    <item>
+        <shape android:shape="rectangle">
+            <size android:width="24dp" android:height="24dp" />
+            <padding android:left="1dp" android:top="1dp" android:right="1dp" android:bottom="1dp" />
+        </shape>
+    </item>
+
+    <!-- Layer 2: Ikon dengan fill yang berubah sesuai state -->
+    <item>
+        <selector>
+            <!-- Saat dipilih: warna hijau penuh -->
+            <item android:state_checked="true">
+                <vector
+                    android:width="24dp"
+                    android:height="24dp"
+                    android:viewportWidth="24.0"
+                    android:viewportHeight="24.0">
+                    <path
+                        android:fillColor="@color/green"
+                        android:pathData="M10,20v-6h4v6h5v-8h3L12,3 2,12h3v8z"/>
+                </vector>
+            </item>
+
+            <!-- Saat tidak dipilih: transparan dengan garis tepi hijau -->
+            <item>
+                <vector
+                    android:width="24dp"
+                    android:height="24dp"
+                    android:viewportWidth="24.0"
+                    android:viewportHeight="24.0">
+                    <path
+                        android:fillColor="@color/transparent"
+                        android:strokeColor="@color/green"
+                        android:strokeWidth="1.5"
+                        android:pathData="M10,20v-6h4v6h5v-8h3L12,3 2,12h3v8z"/>
+                </vector>
+            </item>
+        </selector>
+    </item>
+</layer-list>
