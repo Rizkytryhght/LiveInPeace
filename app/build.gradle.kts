@@ -3,9 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.google.services) // ✅ Ganti dari id("...")
+    alias(libs.plugins.google.services)
 }
-
 
 android {
     namespace = "com.example.liveinpeace"
@@ -41,6 +40,10 @@ android {
         compose = true
     }
 
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.3"
+    }
+
     viewBinding {
         enable = true
     }
@@ -65,30 +68,42 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation ("com.google.firebase:firebase-auth:22.0.0")
-    implementation ("com.google.firebase:firebase-firestore:24.4.0")
-    implementation ("androidx.room:room-runtime:2.4.3")
-    kapt("androidx.room:room-compiler:2.4.3")
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.google.firebase:firebase-auth:23.0.0")
+    implementation("com.google.firebase:firebase-firestore:25.1.0")
+    implementation("com.google.firebase:firebase-firestore-ktx:25.1.0")
 
-    implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation ("com.google.android.material:material:1.9.0")
-    implementation ("io.github.chaosleung:pinview:1.4.4")
+// Room Database
+    implementation("androidx.room:room-runtime:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
 
-    implementation ("androidx.datastore:datastore-preferences:1.0.0")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
-    implementation ("de.hdodenhof:circleimageview:3.1.0")
+// Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 
-    implementation ("androidx.cardview:cardview:1.0.0")
-    implementation ("androidx.recyclerview:recyclerview:1.2.1")
-    implementation ("com.google.firebase:firebase-firestore-ktx:24.0.0")
-    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+// Jetpack Compose Navigation
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
-    implementation(libs.mpandroidchart)
+// Coil untuk gambar di Compose
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+// UI Components
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("io.github.chaosleung:pinview:1.4.4")
+    implementation("androidx.cardview:cardview:1.0.0")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
+// DataStore dan Lifecycle
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+
+// MPAndroidChart untuk grafik
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
 }

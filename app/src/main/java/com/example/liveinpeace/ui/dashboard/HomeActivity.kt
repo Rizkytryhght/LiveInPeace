@@ -11,7 +11,7 @@ import com.example.liveinpeace.viewModel.MoodViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.lifecycle.lifecycleScope
-import com.example.liveinpeace.ui.features.FeatureListActivity
+import com.example.liveinpeace.ui.features.FeaturesListActivity
 import com.example.liveinpeace.ui.note.NoteActivity
 import com.example.liveinpeace.ui.profile.ProfileActivity
 import com.github.mikephil.charting.charts.BarChart
@@ -52,7 +52,7 @@ class HomeActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_features -> {
-                    startActivity(Intent(this, FeatureListActivity::class.java))
+                    startActivity(Intent(this, FeaturesListActivity::class.java))
                     true
                 }
                 R.id.nav_profile -> {

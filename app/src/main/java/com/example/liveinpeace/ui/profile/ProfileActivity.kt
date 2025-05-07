@@ -15,7 +15,7 @@ import com.example.liveinpeace.data.ProfileModel
 import com.example.liveinpeace.data.repository.ProfileRepository
 import com.example.liveinpeace.databinding.ActivityProfileBinding
 import com.example.liveinpeace.ui.auth.AuthActivity
-import com.example.liveinpeace.ui.features.FeatureListActivity
+import com.example.liveinpeace.ui.features.FeaturesListActivity
 import com.example.liveinpeace.ui.home.HomeActivity
 import com.example.liveinpeace.ui.note.NoteActivity
 import com.example.liveinpeace.viewModel.ProfileViewModel
@@ -80,7 +80,7 @@ class ProfileActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_features -> {
-                    startActivity(Intent(this, FeatureListActivity::class.java))
+                    startActivity(Intent(this, FeaturesListActivity::class.java))
                     overridePendingTransition(0, 0)
                     finish()
                     true
