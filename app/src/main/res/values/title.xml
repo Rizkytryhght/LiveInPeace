@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mulai_btn">Mulai</string>
+    <string name="lanjut_btn">Lanjut</string>
+
+    <!-- Onboarding titles -->
+    <string name="judul_onboarding_1">Meditasi Islami untuk Ketenangan</string>
+    <string name="judul_onboarding_2">Temukan Kedamaian Diri</string>
+    <string name="judul_onboarding_3">Hidup dalam Ketentraman</string>
+</resources>

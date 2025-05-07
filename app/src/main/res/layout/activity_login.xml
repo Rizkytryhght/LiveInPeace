@@ -187,7 +187,7 @@
         android:layout_height="wrap_content"
         android:text="Don't have an account? Sign Up"
         android:textSize="14sp"
-        android:textColor="#456687"
+        android:textColor="#2E7D32"
         android:layout_marginTop="16dp"
         android:layout_gravity="center_horizontal"/>
 

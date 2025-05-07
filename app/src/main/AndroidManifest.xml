@@ -25,6 +25,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.onboarding.OnboardingActivity" />
         <activity android:name=".ui.auth.RegisterActivity" />
         <activity android:name=".ui.auth.ForgotPasswordActivity" />
         <activity android:name=".MainActivity" />
@@ -35,7 +36,7 @@
         <activity android:name=".ui.features.FeatureListActivity"/>
         <activity android:name=".ui.home.HomeActivity"/>
         <activity android:name=".ui.checklist.ChecklistIbadahActivity" />
-        <activity android:name=".ui.checklist.ChecklistActivity"/>
+<!--        <activity android:name=".ui.checklist.ChecklistActivity"/>-->
         <activity android:name=".ui.reminder.ReminderActivity"/>
         <receiver android:name=".ui.receiver.ReminderReceiver" />
     </application>
