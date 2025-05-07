@@ -1,12 +1,10 @@
 package com.example.liveinpeace.ui.profile
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +21,7 @@ import com.example.liveinpeace.viewModel.ProfileViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import java.io.File
 
 class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
@@ -30,21 +29,11 @@ class ProfileActivity : AppCompatActivity() {
         ProfileViewModelFactory(ProfileRepository(applicationContext))
     }
 
-    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let {
-            binding.profileImage.setImageURI(it)
-            profileViewModel.saveProfileImageUri(it.toString())
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        Log.d("DEBUG", "onCreate ProfileActivity berjalan")
-
-        // Tombol Logout
         binding.logoutOption.setOnClickListener {
             performLogout()
         }
@@ -52,7 +41,10 @@ class ProfileActivity : AppCompatActivity() {
             performLogout()
         }
 
-        // Observasi profil
+        binding.editProfileIcon.setOnClickListener {
+            startActivity(Intent(this, EditProfileActivity::class.java))
+        }
+
         lifecycleScope.launch {
             profileViewModel.profileState.collect { profile ->
                 updateProfileUI(profile)
@@ -61,10 +53,8 @@ class ProfileActivity : AppCompatActivity() {
 
         profileViewModel.loadProfile()
 
-        // 🚀 Bottom Navigation Setup
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.selectedItemId = R.id.nav_profile
-
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
@@ -85,9 +75,7 @@ class ProfileActivity : AppCompatActivity() {
                     finish()
                     true
                 }
-                R.id.nav_profile -> {
-                    true
-                }
+                R.id.nav_profile -> true
                 else -> false
             }
         }
@@ -95,29 +83,33 @@ class ProfileActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        Log.d("ProfileActivity", "onResume() dipanggil")
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Log.d("ProfileActivity", "onStart() dipanggil")
+        Log.d("ProfileActivity", "onResume: Memuat ulang profil")
         profileViewModel.loadProfile()
     }
 
     private fun performLogout() {
         Toast.makeText(this, "Logout diklik!", Toast.LENGTH_SHORT).show()
         FirebaseAuth.getInstance().signOut()
+        profileViewModel.logout()
         startActivity(Intent(this, AuthActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         })
         finish()
     }
 
-    @SuppressLint("SetTextI18n")
     private fun updateProfileUI(profile: ProfileModel) {
         binding.profileName.text = "${profile.firstName} ${profile.lastName}"
-        profile.profileImageUri?.let { uri ->
-            binding.profileImage.setImageURI(Uri.parse(uri))
+        binding.profileUsername.text = "${profile.email}"
+        if (profile.profileImagePath.isNotBlank()) {
+            try {
+                binding.profileImage.setImageURI(Uri.fromFile(File(profile.profileImagePath)))
+                Log.d("ProfileActivity", "Memuat foto di ProfileActivity: ${profile.profileImagePath}")
+            } catch (e: Exception) {
+                Log.e("ProfileActivity", "Gagal memuat foto: ${e.message}", e)
+                binding.profileImage.setImageResource(R.drawable.user)
+            }
+        } else {
+            binding.profileImage.setImageResource(R.drawable.user)
         }
     }
 }
