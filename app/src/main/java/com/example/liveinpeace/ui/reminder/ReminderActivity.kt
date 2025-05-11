@@ -1,6 +1,5 @@
 package com.example.liveinpeace.ui.reminder
 
-import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -8,104 +7,119 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.widget.Switch
+import android.provider.Settings
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.example.liveinpeace.R
+import com.example.liveinpeace.api.RetrofitInstance
+import com.example.liveinpeace.model.SalatTimesResponse
 import com.example.liveinpeace.ui.receiver.ReminderReceiver
-import java.util.Calendar
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.*
 
-@SuppressLint("UseSwitchCompatOrMaterialCode")
 class ReminderActivity : AppCompatActivity() {
-
-    private lateinit var switchPagi: Switch
-    private lateinit var switchPetang: Switch
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_reminder)
 
-        // Minta izin notifikasi (Android 13+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
-                != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                    1
-                )
-            }
-        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
             if (!alarmManager.canScheduleExactAlarms()) {
-                // Ajak user buat buka pengaturan dan aktifkan
-                val intent = Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                // Prompt the user to enable exact alarm scheduling in settings
+                val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
                 startActivity(intent)
             }
         }
 
-        switchPagi = findViewById(R.id.switchDzikirPagi)
-        switchPetang = findViewById(R.id.switchDzikirPetang)
+        val city = "Bandung"
+        val country = "Indonesia"
 
-        val sharedPref = getSharedPreferences("ReminderPrefs", Context.MODE_PRIVATE)
+        RetrofitInstance.api.getTimingsByCity(city, country)
+            .enqueue(object : Callback<SalatTimesResponse> {
+                override fun onResponse(call: Call<SalatTimesResponse>, response: Response<SalatTimesResponse>) {
+                    if (response.isSuccessful) {
+                        val timings = response.body()?.data?.timings
+                        if (timings != null) {
+                            Log.d("PRAYER_API", "Fajr: ${timings.Fajr}, Maghrib: ${timings.Maghrib}")
 
-        // Set saved state
-        switchPagi.isChecked = sharedPref.getBoolean("pagi", false)
-        switchPetang.isChecked = sharedPref.getBoolean("petang", false)
+                            val pagiTime = timings.Fajr // Dzikir Pagi based on Fajr time
+                            val petangTime = timings.Maghrib // Dzikir Petang based on Maghrib time
 
-        switchPagi.setOnCheckedChangeListener { _, isChecked ->
-            sharedPref.edit().putBoolean("pagi", isChecked).apply()
-            if (isChecked) setReminder(7, 0, "Waktunya Dzikir Pagi!")
-            else cancelReminder("pagi")
-        }
+                            pagiTime?.let {
+                                val time = convertToCalendar(it)
+                                setReminder(time, "Waktunya Dzikir Pagi!")
+                            }
 
-        switchPetang.setOnCheckedChangeListener { _, isChecked ->
-            sharedPref.edit().putBoolean("petang", isChecked).apply()
-            if (isChecked) setReminder(16, 30, "Waktunya Dzikir Petang!")
-            else cancelReminder("petang")
-        }
+                            petangTime?.let {
+                                val time = convertToCalendar(it)
+                                setReminder(time, "Waktunya Dzikir Petang!")
+                            }
+                        } else {
+                            Log.e("PRAYER_API", "Timings not found in the response!")
+                        }
+                    } else {
+                        Log.e("PRAYER_API", "Response not successful: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<SalatTimesResponse>, t: Throwable) {
+                    Toast.makeText(this@ReminderActivity, "Failed to fetch salat times", Toast.LENGTH_SHORT).show()
+                    Log.e("PRAYER_API", "API Call failed: ${t.message}")
+                }
+            })
     }
 
-    @SuppressLint("ScheduleExactAlarm")
-    private fun setReminder(hour: Int, minute: Int, message: String) {
-        val intent = Intent(this, ReminderReceiver::class.java)
-        intent.putExtra("reminder_message", message)
-
-        val requestCode = message.hashCode()
-        val pendingIntent = PendingIntent.getBroadcast(
-            this,
-            requestCode,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, hour)
-            set(Calendar.MINUTE, minute)
-            set(Calendar.SECOND, 0)
-            if (before(Calendar.getInstance())) add(Calendar.DATE, 1)
-        }
-
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            pendingIntent
-        )
+    private fun convertToCalendar(time: String): Calendar {
+        val timeParts = time.split(":")
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, timeParts[0].toInt())
+        calendar.set(Calendar.MINUTE, timeParts[1].toInt())
+        calendar.set(Calendar.SECOND, 0)
+        return calendar
     }
 
-    private fun cancelReminder(key: String) {
-        val message = if (key == "pagi") "Waktunya Dzikir Pagi!" else "Waktunya Dzikir Petang!"
-        val intent = Intent(this, ReminderReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            this,
-            message.hashCode(),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.cancel(pendingIntent)
+    private fun setReminder(calendar: Calendar, message: String) {
+        try {
+            val intent = Intent(this, ReminderReceiver::class.java)
+            intent.putExtra("reminder_message", message)
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                this,
+                message.hashCode(),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+
+            // For Android versions below Android 12 (API 30), no special permission is required
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.timeInMillis,
+                    pendingIntent
+                )
+            }
+            // For Android 12 and above, ensure exact alarm permission is granted
+            else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (alarmManager.canScheduleExactAlarms()) {
+                    alarmManager.setExactAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        calendar.timeInMillis,
+                        pendingIntent
+                    )
+                } else {
+                    // If permission is not granted, show a Toast message or prompt the user
+                    Toast.makeText(this, "Permission to schedule exact alarms is denied.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } catch (e: SecurityException) {
+            // Handle case where app doesn't have permission to schedule exact alarms
+            Toast.makeText(this, "Permission to schedule exact alarms is denied.", Toast.LENGTH_SHORT).show()
+            Log.e("ReminderActivity", "Error setting alarm: ${e.message}")
+        }
     }
 }
