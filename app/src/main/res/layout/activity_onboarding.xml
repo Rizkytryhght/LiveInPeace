@@ -66,7 +66,7 @@
             android:layout_height="wrap_content"
             app:cardCornerRadius="8dp"
             app:cardElevation="0dp"
-            app:cardBackgroundColor="@color/green">
+            app:cardBackgroundColor="#2E7D32">
 
             <TextView
                 android:id="@+id/btnNext"
@@ -86,7 +86,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Skip"
-            android:textColor="@color/green"
+            android:textColor="#2E7D32"
             android:textSize="16sp"
             android:textStyle="bold"
             android:padding="16dp"/>
