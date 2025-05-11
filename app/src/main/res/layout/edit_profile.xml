@@ -20,8 +20,14 @@
             android:id="@+id/backButton"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
             android:src="@drawable/ic_back_arrow"
+            android:scaleType="centerCrop"
+            android:clickable="true"
+            android:focusable="true"
             android:contentDescription="Back"/>
+            
 
         <TextView
             android:layout_width="match_parent"
@@ -171,7 +177,7 @@
         android:layout_height="50dp"
         android:text="Update Profile"
         android:textColor="@android:color/white"
-        android:padding="16dp"
+        android:padding="2dp"
         android:textSize="16sp"
         android:background="@drawable/green_button_background"
         android:gravity="center"

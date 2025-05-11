@@ -1,44 +1,66 @@
 package com.example.liveinpeace.data.repository
 
 import android.content.Context
-import android.content.SharedPreferences
+import android.net.Uri
 import android.util.Log
 import com.example.liveinpeace.data.ProfileModel
+import com.example.liveinpeace.data.local.room.AppDatabase
+import java.io.File
+import java.io.FileOutputStream
 
 class ProfileRepository(private val context: Context) {
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("UserProfile", Context.MODE_PRIVATE)
+    private val profileDao = AppDatabase.getDatabase(context).profileDao()
 
-    fun getProfile(): ProfileModel {
-        val firstName = sharedPreferences.getString("first_name", "") ?: ""
-        val lastName = sharedPreferences.getString("last_name", "") ?: ""
-        val profileImageUri = sharedPreferences.getString("profile_image", "") ?: ""
-
-        return ProfileModel(firstName, lastName, "", "", "", profileImageUri)
+    suspend fun getProfile(): ProfileModel {
+        val profileEntity = profileDao.getProfile()
+        Log.d("ProfileRepository", "Mengambil profil: $profileEntity")
+        return ProfileModel.fromEntity(profileEntity)
     }
 
-    fun saveProfile(profile: ProfileModel) {
-        sharedPreferences.edit().apply {
-            putString("first_name", profile.firstName)
-            putString("last_name", profile.lastName)
-            putString("profile_image", profile.profileImageUri)
-            apply()
+    suspend fun saveProfile(profile: ProfileModel) {
+        val existingProfile = profileDao.getProfile()
+        val profileEntity = profile.toEntity()
+        if (existingProfile == null) {
+            Log.d("ProfileRepository", "Menyimpan profil baru: $profileEntity")
+            profileDao.insertProfile(profileEntity)
+        } else {
+            Log.d("ProfileRepository", "Memperbarui profil: $profileEntity")
+            profileDao.updateProfile(profileEntity)
         }
     }
 
-    fun saveProfileImage(uri: String) {
-        sharedPreferences.edit().putString("profile_image", uri).apply()
+    suspend fun saveProfileImage(uri: Uri): String {
+        try {
+            // Salin file ke penyimpanan internal
+            val inputStream = context.contentResolver.openInputStream(uri)
+            if (inputStream == null) {
+                Log.e("ProfileRepository", "Gagal membuka input stream untuk URI: $uri")
+                return ""
+            }
+            val file = File(context.filesDir, "profile_image.jpg")
+            FileOutputStream(file).use { output ->
+                inputStream.copyTo(output)
+            }
+            inputStream.close()
+
+            // Perbarui profil dengan path baru
+            val currentProfile = getProfile()
+            val updatedProfile = currentProfile.copy(profileImagePath = file.absolutePath)
+            saveProfile(updatedProfile)
+            Log.d("ProfileRepository", "Foto disimpan di: ${file.absolutePath}")
+            return file.absolutePath
+        } catch (e: Exception) {
+            Log.e("ProfileRepository", "Gagal menyimpan foto: ${e.message}", e)
+            return ""
+        }
     }
 
-    fun loadProfile(): ProfileModel {
-        val firstName = sharedPreferences.getString("firstName", "") ?: ""
-        val lastName = sharedPreferences.getString("lastName", "") ?: ""
-        val profileImageUri = sharedPreferences.getString("profileImageUri", "") ?: ""
-
-        return ProfileModel(firstName, lastName, "", "", "", profileImageUri)
-    }
-
-    fun clearProfileData() {
-        sharedPreferences.edit().clear().apply()
+    suspend fun clearProfileData() {
+        profileDao.clearProfile()
+        val file = File(context.filesDir, "profile_image.jpg")
+        if (file.exists()) {
+            file.delete()
+            Log.d("ProfileRepository", "File foto dihapus: ${file.absolutePath}")
+        }
     }
 }
