@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.INTERNET" />
 
-
     <application
         android:name=".LiveInPeaceApp"
         android:allowBackup="true"
@@ -38,15 +37,12 @@
         <activity android:name=".ui.note.NoteDetailActivity" />
         <activity android:name=".ui.note.NoteActivity" />
         <activity android:name=".ui.auth.AuthActivity"/>
-        <activity android:name=".ui.features.FeatureListActivity"/>
+        <activity android:name=".ui.features.FeaturesListActivity"/>
         <activity android:name=".ui.home.HomeActivity"/>
         <activity android:name=".ui.checklist.ChecklistIbadahActivity" />
-<!--        <activity android:name=".ui.checklist.ChecklistActivity"/>-->
+        <activity android:name=".ui.checklist.ChecklistActivity"/>
+        <activity android:name=".ui.dashboard.HomeActivity"/>
         <activity android:name=".ui.reminder.ReminderActivity"/>
-<!--        <receiver android:name=".ui.receiver.ReminderReceiver" />-->
-
-        <!-- Reminder Receiver -->
         <receiver android:name=".ui.receiver.ReminderReceiver" android:exported="false" />
     </application>
-
 </manifest>

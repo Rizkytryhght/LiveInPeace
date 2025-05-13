@@ -12,7 +12,7 @@ import com.example.liveinpeace.ui.profile.ProfileActivity
 import com.example.liveinpeace.ui.reminder.ReminderActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class FeatureListActivity : AppCompatActivity() {
+class FeaturesListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feature_list)

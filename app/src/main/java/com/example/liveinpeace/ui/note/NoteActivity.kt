@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.liveinpeace.R
 import com.example.liveinpeace.data.Note
 import com.example.liveinpeace.data.repository.NoteRepository
-import com.example.liveinpeace.ui.features.FeatureListActivity
+import com.example.liveinpeace.ui.features.FeaturesListActivity
 import com.example.liveinpeace.ui.home.HomeActivity
 import com.example.liveinpeace.ui.profile.ProfileActivity // 🔥 Import ini
 import com.example.liveinpeace.viewModel.NoteViewModel
@@ -92,7 +92,7 @@ class NoteActivity : AppCompatActivity() {
                 }
                 R.id.nav_notes -> true // udah di sini
                 R.id.nav_features -> {
-                    startActivity(Intent(this, FeatureListActivity::class.java))
+                    startActivity(Intent(this, FeaturesListActivity::class.java))
                     overridePendingTransition(0, 0)
                     finish()
                     true
