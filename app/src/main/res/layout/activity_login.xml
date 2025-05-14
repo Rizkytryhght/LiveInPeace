@@ -11,12 +11,11 @@
     <!-- App Logo -->
     <ImageView
         android:id="@+id/logoImageView"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/ic_shield_check"
-        app:tint="#2E7D32"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:src="@drawable/liveinpeace2"
         android:layout_marginBottom="24dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="40dp"
         android:layout_gravity="center_horizontal"/>
 
     <!-- Title -->
@@ -70,7 +69,8 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:layout_marginBottom="12dp"
-            android:background="@drawable/edit_text_background"/>
+            android:background="@drawable/edit_text_background"
+            android:inputType="textPassword"/> <!-- Tambahkan baris ini -->
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Remember Me and Forgot Password Row -->
