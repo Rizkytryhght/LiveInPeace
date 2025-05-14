@@ -13,5 +13,6 @@ data class Timings(
     val Dhuhr: String,
     val Asr: String,
     val Maghrib: String,
-    val Isha: String
+    val Isha: String,
+    val Sunrise: String // Optional but useful for determining Dzikir Pagi time
 )

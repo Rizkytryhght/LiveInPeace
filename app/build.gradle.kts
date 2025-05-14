@@ -3,7 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.google.services) }
+    alias(libs.plugins.google.services)
+}
 
 android {
     namespace = "com.example.liveinpeace"
@@ -28,13 +29,16 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+
     kotlinOptions {
         jvmTarget = "21"
     }
+
     buildFeatures {
         compose = true
     }
@@ -74,19 +78,19 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.firestore.ktx)
 
-// Room Database
+    // Room Database
     implementation(libs.room.runtime)
     kapt(libs.room.compiler)
     implementation("androidx.room:room-ktx:2.6.1")
 
-// Retrofit
+    // Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
 
-// Coil untuk gambar di Compose
+    // Coil untuk gambar di Compose
     implementation(libs.coil.compose)
 
-// UI Components
+    // UI Components
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation(libs.material)
     implementation("io.github.chaosleung:pinview:1.4.4")
@@ -94,16 +98,25 @@ dependencies {
     implementation(libs.recyclerview)
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
-// DataStore dan Lifecycle
+    // DataStore dan Lifecycle
     implementation(libs.datastore.preferences)
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
     implementation("androidx.activity:activity-ktx:1.7.2")
 
-// Jetpack Compose Navigation
+    // Jetpack Compose Navigation
     implementation(libs.androidx.navigation.compose)
 
-// MPAndroidChart untuk grafik
+    // MPAndroidChart untuk grafik
     implementation(libs.mpandroidchart)
     implementation("androidx.compose.material:material-icons-extended")
+
+    // Tambahan Compose terbaru
+    implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("androidx.compose.foundation:foundation:1.5.4")
+    implementation("androidx.compose.ui:ui-tooling:1.5.4")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.compose.ui:ui")
 }
