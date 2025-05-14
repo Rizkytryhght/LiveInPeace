@@ -96,6 +96,42 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+<!-- DASS Test Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardDASSQuestionnaire"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#A5D6A7"
+        app:layout_constraintTop_toBottomOf="@id/cardChecklistIbadah"
+        app:layout_constraintStart_toStartOf="@id/cardChecklistIbadah"
+        app:layout_constraintEnd_toEndOf="@id/cardChecklistIbadah"
+        android:layout_marginTop="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🥶"
+                android:textSize="70sp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Test DASS"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#000000" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
     <!-- Bottom Navigation View -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"

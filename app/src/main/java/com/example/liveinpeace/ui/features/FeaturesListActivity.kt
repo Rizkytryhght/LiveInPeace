@@ -10,6 +10,7 @@ import com.example.liveinpeace.ui.home.HomeActivity
 import com.example.liveinpeace.ui.note.NoteActivity
 import com.example.liveinpeace.ui.profile.ProfileActivity
 import com.example.liveinpeace.ui.reminder.ReminderActivity
+import com.example.liveinpeace.ui.dass.DASSQuestionnaireActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class FeatureListActivity : AppCompatActivity() {
@@ -27,6 +28,12 @@ class FeatureListActivity : AppCompatActivity() {
         val reminderCard = findViewById<CardView>(R.id.reminderCard)
         reminderCard.setOnClickListener {
             val intent = Intent(this, ReminderActivity::class.java)
+            startActivity(intent)
+        }
+
+        val cardDASSQuestionnaire = findViewById<CardView>(R.id.cardDASSQuestionnaire) // ID baru
+        cardDASSQuestionnaire.setOnClickListener {
+            val intent = Intent(this, DASSQuestionnaireActivity::class.java)
             startActivity(intent)
         }
 
