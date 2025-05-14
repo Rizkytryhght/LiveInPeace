@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.liveinpeace.R
-import com.example.liveinpeace.ui.features.FeatureListActivity
+import com.example.liveinpeace.ui.features.FeaturesListActivity
 import com.example.liveinpeace.ui.note.NoteActivity
 import com.example.liveinpeace.ui.profile.ProfileActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -27,7 +27,7 @@ class HomeActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_features -> {
-                    startActivity(Intent(this, FeatureListActivity::class.java))
+                    startActivity(Intent(this, FeaturesListActivity::class.java))
                     overridePendingTransition(0, 0)
                     finish()
                     true

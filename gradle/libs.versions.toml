@@ -9,19 +9,17 @@ lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2024.04.01"
 appcompat = "1.7.0"
-firebaseAuth = "23.2.0"
+firebase-auth = "23.2.0" # Pilih versi terbaru, hapus firebaseAuth
 firebaseDatabase = "21.0.0"
 mpandroidchart = "v3.1.0"
 google-services = "4.4.1"
-navigationCompose = "2.8.9"
-navigation-compose = "2.7.7"
+navigation-compose = "2.8.9" # Pilih versi terbaru, hapus navigationCompose
 coil-compose = "2.6.0"
 room = "2.6.1"
 retrofit = "2.11.0"
 material = "1.12.0"
 recyclerview = "1.3.2"
 datastore = "1.1.1"
-firebase-auth = "23.0.0"
 firebase-firestore = "25.1.0"
 
 [libraries]
@@ -41,12 +39,9 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebase-auth" } # Pakai firebase-auth
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
-#noinspection SimilarGradleDependency
-androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
-#noinspection SimilarGradleDependency
-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" } # Hanya satu entri
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil-compose" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }

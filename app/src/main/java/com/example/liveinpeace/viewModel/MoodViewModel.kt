@@ -4,26 +4,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.liveinpeace.data.repository.MoodRepository
 import com.example.liveinpeace.model.MoodEntry
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class MoodViewModel : ViewModel() {
     private val repository = MoodRepository()
 
-    private val _moods = MutableStateFlow<List<MoodEntry>>(emptyList())
-    val moods: StateFlow<List<MoodEntry>> = _moods
+    val moods: Flow<List<MoodEntry>> = repository.getAllMoods()
 
     fun saveMood(mood: String) {
         viewModelScope.launch {
-            repository.saveMood(mood)
-            loadMoods()
-        }
-    }
-
-    fun loadMoods() {
-        viewModelScope.launch {
-            _moods.value = repository.getAllMoods()
+            try {
+                repository.saveMood(mood)
+            } catch (e: Exception) {
+                println("Error saving mood in ViewModel: ${e.message}")
+            }
         }
     }
 }

@@ -3,8 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.google.services)
-}
+    alias(libs.plugins.google.services) }
 
 android {
     namespace = "com.example.liveinpeace"
@@ -70,41 +69,41 @@ dependencies {
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
+    implementation(libs.firebase.auth)
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth:23.0.0")
-    implementation("com.google.firebase:firebase-firestore:25.1.0")
-    implementation("com.google.firebase:firebase-firestore-ktx:25.1.0")
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.firestore.ktx)
 
-    // Room Database
-    implementation("androidx.room:room-runtime:2.6.1")
-    kapt("androidx.room:room-compiler:2.6.1")
+// Room Database
+    implementation(libs.room.runtime)
+    kapt(libs.room.compiler)
     implementation("androidx.room:room-ktx:2.6.1")
 
-    // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+// Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
 
-    // Coil untuk gambar di Compose
-    implementation("io.coil-kt:coil-compose:2.6.0")
+// Coil untuk gambar di Compose
+    implementation(libs.coil.compose)
 
-    // UI Components
+// UI Components
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation(libs.material)
     implementation("io.github.chaosleung:pinview:1.4.4")
     implementation("androidx.cardview:cardview:1.0.0")
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation(libs.recyclerview)
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
-    // DataStore dan Lifecycle
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
+// DataStore dan Lifecycle
+    implementation(libs.datastore.preferences)
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
     implementation("androidx.activity:activity-ktx:1.7.2")
 
-    // Jetpack Compose Navigation
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+// Jetpack Compose Navigation
+    implementation(libs.androidx.navigation.compose)
 
-    // MPAndroidChart untuk grafik
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+// MPAndroidChart untuk grafik
+    implementation(libs.mpandroidchart)
+    implementation("androidx.compose.material:material-icons-extended")
 }

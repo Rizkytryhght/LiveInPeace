@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.liveinpeace.R
-import com.example.liveinpeace.ui.features.FeatureListActivity
+import com.example.liveinpeace.ui.features.FeaturesListActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -380,7 +380,7 @@ class ChecklistIbadahActivity : AppCompatActivity() {
 
                 // Only navigate back to feature list if this is today's checklist
                 if (selectedDate == todayFormat) {
-                    val intent = Intent(this, FeatureListActivity::class.java)
+                    val intent = Intent(this, FeaturesListActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                     startActivity(intent)
                     finish()
