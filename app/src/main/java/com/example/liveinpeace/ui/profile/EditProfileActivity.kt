@@ -102,7 +102,7 @@ class EditProfileActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
             pickImageLauncher.launch("image/*")
         } else {
-            requestPermissionLauncher.launch(permission)
+                requestPermissionLauncher.launch(permission)
         }
     }
 
