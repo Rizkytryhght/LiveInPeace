@@ -1,10 +1,7 @@
 package com.example.liveinpeace.ui.dass
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,7 +10,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.compose.runtime.mutableStateMapOf
 
 @Composable
 fun DASSQuestionnaireScreen(navController: NavController) {
@@ -21,31 +17,35 @@ fun DASSQuestionnaireScreen(navController: NavController) {
     val answers = remember { mutableStateMapOf<Int, Int>() }
     val totalQuestions = 21
     val greenColor = Color(0xFF4CAF50)
+    var showDialog by remember { mutableStateOf(false) }
 
-    // Daftar pertanyaan
+    // Daftar pertanyaan dari PDF (hardcoded)
     val questions = listOf(
-        "I found it hard to wind down",
-        "I was aware of dryness of my mouth",
-        "I couldn't seem to experience any positive feeling at all",
-        "I experienced breathing difficulty (eg, excessively rapid breathing, breathlessness in the absence of physical exertion)",
-        "I found it difficult to work up the initiative to do things",
-        "I tended to over-react to situations",
-        "I experienced trembling (eg, in the hands)",
-        "I felt that I was using a lot of nervous energy",
-        "I was worried about situations in which I might panic and make a fool of myself",
-        "I felt that I had nothing to look forward to",
-        "I found myself getting agitated",
-        "I found it difficult to relax",
-        "I felt down-hearted and blue",
-        "I was intolerant of anything that kept me from getting on with what I was doing",
-        "I felt I was close to panic",
-        "I was unable to become enthusiastic about anything",
-        "I felt I wasn't worth much as a person",
-        "I felt that I was rather touchy",
-        "I was aware of the action of my heart in the absence of physical exertion (eg, sense of heart rate increase, heart missing a beat)",
-        "I felt scared without any good reason",
-        "I felt that life was meaningless"
+        "Saya merasa sulit untuk menenangkan diri",
+        "Saya menyadari mulut saya terasa kering",
+        "Saya tidak bisa merasakan perasaan positif sama sekali",
+        "Saya mengalami kesulitan bernapas (misalnya, bernapas terlalu cepat, terengah-engah saat tidak melakukan aktivitas fisik)",
+        "Saya merasa sulit untuk mengambil inisiatif untuk melakukan sesuatu",
+        "Saya cenderung bereaksi berlebihan terhadap situasi",
+        "Saya mengalami gemetar (misalnya, di tangan)",
+        "Saya merasa bahwa saya menggunakan banyak energi karena gugup",
+        "Saya khawatir dengan situasi di mana saya mungkin panik dan mempermalukan diri saya sendiri",
+        "Saya merasa tidak ada yang bisa saya nantikan",
+        "Saya merasa gelisah",
+        "Saya merasa sulit untuk rileks",
+        "Saya merasa sedih dan murung",
+        "Saya tidak toleran terhadap apa pun yang menghalangi saya untuk melanjutkan apa yang sedang saya kerjakan",
+        "Saya merasa hampir panik",
+        "Saya tidak bisa antusias terhadap apa pun",
+        "Saya merasa saya tidak terlalu berharga sebagai manusia",
+        "Saya merasa bahwa saya agak sensitif",
+        "Saya sadar akan tindakan jantung saya tanpa adanya aktivitas fisik (misalnya, rasa detak jantung meningkat, jantung tidak berdetak)",
+        "Saya merasa takut tanpa alasan yang kuat",
+        "Saya merasa hidup tidak ada artinya"
     )
+
+    // Validasi: Cek apakah semua pertanyaan sudah dijawab
+    val allQuestionsAnswered = answers.size == totalQuestions
 
     Column(
         modifier = Modifier
@@ -70,7 +70,7 @@ fun DASSQuestionnaireScreen(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Opsi jawaban
+        // Opsi jawaban (Radio Buttons)
         val options = listOf(
             "0 - Tidak pernah",
             "1 - Kadang-kadang",
@@ -120,16 +120,49 @@ fun DASSQuestionnaireScreen(navController: NavController) {
                     if (currentQuestion < totalQuestions) {
                         currentQuestion++
                     } else {
-                        navController.navigate("dass_result")
+                        if (allQuestionsAnswered) {
+                            showDialog = true // Tampilkan dialog konfirmasi
+                        }
                     }
                 },
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = greenColor)
+                colors = ButtonDefaults.buttonColors(containerColor = greenColor),
+                enabled = if (currentQuestion < totalQuestions) {
+                    answers.containsKey(currentQuestion) // Pastikan jawaban dipilih untuk "Next"
+                } else {
+                    allQuestionsAnswered // Pastikan semua pertanyaan dijawab untuk "Selesai"
+                }
             ) {
                 Text(text = if (currentQuestion < totalQuestions) "Next" else "Selesai")
             }
         }
+    }
+
+    // AlertDialog untuk konfirmasi submit
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Konfirmasi Pengiriman") },
+            text = { Text("Apakah Anda yakin ingin mengirim jawaban kuesioner sekarang?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                        navController.navigate("dass_result")
+                    }
+                ) {
+                    Text("Ya")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDialog = false }
+                ) {
+                    Text("Tidak")
+                }
+            }
+        )
     }
 }
