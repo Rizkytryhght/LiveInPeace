@@ -20,7 +20,8 @@ fun DASSQuestionnaireScreen(navController: NavController) {
     val answers = remember { mutableStateMapOf<Int, Int>() }
     val totalQuestions = 21
     val greenColor = Color(0xFF4CAF50)
-    var showDialog by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) } // Dialog untuk submit
+    var showBackDialog by remember { mutableStateOf(false) } // Dialog untuk kembali
 
     // Daftar pertanyaan dari PDF (hardcoded)
     val questions = listOf(
@@ -116,7 +117,15 @@ fun DASSQuestionnaireScreen(navController: NavController) {
                     Text(text = "Back")
                 }
             } else {
-                Spacer(modifier = Modifier.weight(1f))
+                Button(
+                    onClick = { showBackDialog = true }, // Tampilkan dialog konfirmasi kembali
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = greenColor)
+                ) {
+                    Text(text = "Back")
+                }
             }
             Button(
                 onClick = {
@@ -166,6 +175,35 @@ fun DASSQuestionnaireScreen(navController: NavController) {
             dismissButton = {
                 TextButton(
                     onClick = { showDialog = false }
+                ) {
+                    Text("Tidak")
+                }
+            }
+        )
+    }
+
+    // AlertDialog untuk konfirmasi kembali ke pengenalan
+    if (showBackDialog) {
+        AlertDialog(
+            onDismissRequest = { showBackDialog = false },
+            title = { Text("Konfirmasi Kembali") },
+            text = { Text("Apakah Anda yakin ingin kembali ke halaman pengenalan? Progres tes akan hilang.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showBackDialog = false
+                        navController.navigate("dass_introduction") {
+                            // Hapus back stack kuesioner agar tidak kembali ke soal
+                            popUpTo("dass_questionnaire") { inclusive = true }
+                        }
+                    }
+                ) {
+                    Text("Ya")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showBackDialog = false }
                 ) {
                     Text("Tidak")
                 }
