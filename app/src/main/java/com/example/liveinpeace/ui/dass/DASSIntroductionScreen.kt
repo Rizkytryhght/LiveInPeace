@@ -141,7 +141,7 @@ fun DASSIntroductionScreen(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text =  "Anda akan diminta untuk mengisi setiap soal yang ada, dengan mengklik pilihan yang paling sesuai dengan pengalaman anda selama 1 minggu terakhir.\n" +
+                    text =  "Anda akan diminta untuk mengisi setiap soal yang ada, dengan mengklik pilihan yang paling sesuai dengan pengalaman anda selama 1 minggu terakhir.  \n" +
                             "Terdapat empat pilihan jawaban yang disediakan untuk setiap pertanyaan yaitu:\n" +
                             "0 - Tidak sesuai dengan saya sama sekali, atau tidak pernah\n" +
                             "1 - Sesuai dengan saya sampai tingkat tertentu, atau Kadang-kadang\n" +

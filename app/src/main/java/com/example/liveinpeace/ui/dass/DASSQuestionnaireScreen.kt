@@ -10,6 +10,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import android.util.Log
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @Composable
 fun DASSQuestionnaireScreen(navController: NavController) {
@@ -121,7 +124,7 @@ fun DASSQuestionnaireScreen(navController: NavController) {
                         currentQuestion++
                     } else {
                         if (allQuestionsAnswered) {
-                            showDialog = true // Tampilkan dialog konfirmasi
+                            showDialog = true
                         }
                     }
                 },
@@ -130,9 +133,9 @@ fun DASSQuestionnaireScreen(navController: NavController) {
                     .padding(start = 8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = greenColor),
                 enabled = if (currentQuestion < totalQuestions) {
-                    answers.containsKey(currentQuestion) // Pastikan jawaban dipilih untuk "Next"
+                    answers.containsKey(currentQuestion)
                 } else {
-                    allQuestionsAnswered // Pastikan semua pertanyaan dijawab untuk "Selesai"
+                    allQuestionsAnswered
                 }
             ) {
                 Text(text = if (currentQuestion < totalQuestions) "Next" else "Selesai")
@@ -150,7 +153,11 @@ fun DASSQuestionnaireScreen(navController: NavController) {
                 TextButton(
                     onClick = {
                         showDialog = false
-                        navController.navigate("dass_result")
+                        // Konversi answers ke string dan encode untuk URL
+                        val answersString = answers.entries.joinToString(",") { "${it.key}:${it.value}" }
+                        val encodedAnswers = URLEncoder.encode(answersString, StandardCharsets.UTF_8.toString())
+                        Log.d("DASSQuestionnaire", "Navigating with answers: $answersString")
+                        navController.navigate("dass_result/$encodedAnswers")
                     }
                 ) {
                     Text("Ya")
