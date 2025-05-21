@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.clickable
 import androidx.navigation.NavController
 import android.util.Log
 import java.net.URLEncoder
@@ -85,12 +86,14 @@ fun DASSQuestionnaireScreen(navController: NavController) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable { answers[currentQuestion] = index }
                     .padding(vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 RadioButton(
                     selected = answers[currentQuestion] == index,
-                    onClick = { answers[currentQuestion] = index }
+                    onClick = { answers[currentQuestion] = index },
+                    modifier = Modifier.padding(end = 8.dp)
                 )
                 Text(
                     text = option,
