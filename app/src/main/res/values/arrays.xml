@@ -1,0 +1,6 @@
+<resources>
+    <string-array name="view_options">
+        <item>Hari</item>
+        <item>Minggu</item>
+    </string-array>
+</resources>

@@ -1,0 +1,21 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- State saat tombol diklik (pressed) -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#2A3F4D" /> <!-- Warna lebih gelap saat diklik -->
+            <corners android:radius="8dp" /> <!-- Sudut membulat -->
+            <stroke android:width="1dp" android:color="#1E2A32" /> <!-- Border -->
+            <padding android:left="16dp" android:top="8dp" android:right="16dp" android:bottom="8dp" />
+        </shape>
+    </item>
+
+    <!-- State default -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#324F5E" /> <!-- Warna default -->
+            <corners android:radius="8dp" /> <!-- Sudut membulat -->
+            <stroke android:width="1dp" android:color="#1E2A32" /> <!-- Border -->
+            <padding android:left="16dp" android:top="8dp" android:right="16dp" android:bottom="8dp" />
+        </shape>
+    </item>
+</selector>

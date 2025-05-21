@@ -9,16 +9,20 @@ import java.util.*
 
 class MoodRepository {
     private val db = FirebaseFirestore.getInstance()
-    private val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    private val userId = FirebaseAuth.getInstance().currentUser?.uid ?: throw IllegalStateException("User not logged in")
 
     private val moodCollection = db.collection("users")
         .document(userId)
         .collection("mood_entries")
 
     suspend fun saveMood(mood: String) {
+        try{
         val today = getTodayDate()
         val moodEntry = MoodEntry(mood = mood, timestamp = System.currentTimeMillis())
         moodCollection.document(today).set(moodEntry).await()
+    } catch (e: Exception){
+        throw Exception("Failed to save mood: ${e.message}")
+    }
     }
 
     suspend fun getAllMoods(): List<MoodEntry> {

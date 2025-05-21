@@ -109,4 +109,9 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation ("androidx.compose.ui:ui")
     coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.0.4")
+    implementation ("androidx.activity:activity-compose:1.9.0")
+    implementation ("androidx.compose.material:material:1.6.0")
+
+    implementation ("com.google.android.gms:play-services-base:18.5.0")
+
 }
