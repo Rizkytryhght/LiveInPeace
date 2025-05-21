@@ -31,28 +31,27 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = "21"
+        //jvmTarget = "21"
+        jvmTarget = "1.8"
     }
 
     buildFeatures {
         compose = true
+        viewBinding = true
     }
 
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
     }
-
-    viewBinding {
-        enable = true
-    }
 }
 
 dependencies {
+    // AndroidX & Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -62,14 +61,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.appcompat)
-    implementation(libs.firebase.database)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
@@ -77,8 +68,9 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.database)
 
-    // Room Database
+    // Room
     implementation(libs.room.runtime)
     kapt(libs.room.compiler)
     implementation("androidx.room:room-ktx:2.6.1")
@@ -89,7 +81,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
 
-    // Coil untuk gambar di Compose
+    // Coil for images
     implementation(libs.coil.compose)
 
     // UI Components
@@ -102,21 +94,19 @@ dependencies {
 
     // Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.7.0")
+    implementation(libs.androidx.navigation.compose)
 
-    // DataStore dan Lifecycle
+    // DataStore & Lifecycle
     implementation(libs.datastore.preferences)
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
     implementation("androidx.activity:activity-ktx:1.7.2")
 
-    // Jetpack Compose Navigation
-    implementation(libs.androidx.navigation.compose)
-
-    // MPAndroidChart untuk grafik
+    // MPAndroidChart for Mood Chart
     implementation(libs.mpandroidchart)
     implementation("androidx.compose.material:material-icons-extended")
 
-    // Tambahan Compose terbaru
+    // Jetpack Compose Extensions (gabungan)
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.compose.foundation:foundation:1.5.4")
     implementation("androidx.compose.ui:ui-tooling:1.5.4")
@@ -124,4 +114,14 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.compose.ui:ui")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
+    // Testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }
