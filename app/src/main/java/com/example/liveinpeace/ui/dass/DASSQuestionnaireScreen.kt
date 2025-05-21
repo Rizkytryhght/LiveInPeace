@@ -1,5 +1,6 @@
 package com.example.liveinpeace.ui.dass
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -9,9 +10,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.clickable
 import androidx.navigation.NavController
 import android.util.Log
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.style.TextAlign
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -20,11 +22,9 @@ fun DASSQuestionnaireScreen(navController: NavController) {
     var currentQuestion by remember { mutableStateOf(1) }
     val answers = remember { mutableStateMapOf<Int, Int>() }
     val totalQuestions = 21
-    val greenColor = Color(0xFF4CAF50)
-    var showDialog by remember { mutableStateOf(false) } // Dialog untuk submit
-    var showBackDialog by remember { mutableStateOf(false) } // Dialog untuk kembali
+    var showDialog by remember { mutableStateOf(false) }
+    var showBackDialog by remember { mutableStateOf(false) }
 
-    // Daftar pertanyaan dari PDF (hardcoded)
     val questions = listOf(
         "Saya merasa sulit untuk menenangkan diri",
         "Saya menyadari mulut saya terasa kering",
@@ -49,168 +49,139 @@ fun DASSQuestionnaireScreen(navController: NavController) {
         "Saya merasa hidup tidak ada artinya"
     )
 
-    // Validasi: Cek apakah semua pertanyaan sudah dijawab
     val allQuestionsAnswered = answers.size == totalQuestions
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color(0xFFF5F7FA))
             .padding(16.dp),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Judul pertanyaan
+        // Header
         Text(
             text = "Pertanyaan ${currentQuestion}/$totalQuestions",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF2196F3),
+            modifier = Modifier.padding(bottom = 16.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
 
-        // Teks pertanyaan
-        Text(
-            text = questions[currentQuestion - 1],
-            fontSize = 16.sp,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(24.dp))
+        // Pertanyaan dalam Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Text(
+                text = questions[currentQuestion - 1],
+                fontSize = 18.sp,
+                color = Color(0xFF333333),
+                modifier = Modifier
+                    .padding(20.dp)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        }
 
-        // Opsi jawaban (Radio Buttons)
+        // Opsi jawaban
         val options = listOf(
             "0 - Tidak pernah",
             "1 - Kadang-kadang",
             "2 - Sering",
             "3 - Sangat sering"
         )
-        options.forEachIndexed { index, option ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { answers[currentQuestion] = index }
-                    .padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = answers[currentQuestion] == index,
-                    onClick = { answers[currentQuestion] = index },
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Text(
-                    text = option,
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(start = 8.dp)
+        Column {
+            options.forEachIndexed { index, option ->
+                QuestionItem(
+                    option = option,
+                    isSelected = answers[currentQuestion] == index,
+                    onClick = { answers[currentQuestion] = index }
                 )
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
 
         // Tombol navigasi
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            if (currentQuestion > 1) {
-                Button(
-                    onClick = { currentQuestion-- },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = greenColor)
-                ) {
-                    Text(text = "Back")
-                }
-            } else {
-                Button(
-                    onClick = { showBackDialog = true }, // Tampilkan dialog konfirmasi kembali
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = greenColor)
-                ) {
-                    Text(text = "Back")
-                }
-            }
-            Button(
-                onClick = {
-                    if (currentQuestion < totalQuestions) {
-                        currentQuestion++
-                    } else {
-                        if (allQuestionsAnswered) {
-                            showDialog = true
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = greenColor),
-                enabled = if (currentQuestion < totalQuestions) {
-                    answers.containsKey(currentQuestion)
+        NavigationButtons(
+            onBackClick = { currentQuestion-- },
+            onNextClick = {
+                if (currentQuestion < totalQuestions) {
+                    currentQuestion++
                 } else {
-                    allQuestionsAnswered
+                    if (allQuestionsAnswered) {
+                        showDialog = true
+                    }
                 }
-            ) {
-                Text(text = if (currentQuestion < totalQuestions) "Next" else "Selesai")
-            }
-        }
+            },
+            isFirstQuestion = currentQuestion == 1,
+            isLastQuestion = currentQuestion == totalQuestions,
+            isAnswered = answers.containsKey(currentQuestion),
+            showBackDialog = { showBackDialog = it }
+        )
     }
 
     // AlertDialog untuk konfirmasi submit
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Konfirmasi Pengiriman") },
-            text = { Text("Apakah Anda yakin ingin mengirim jawaban kuesioner sekarang?") },
+            title = { Text("Konfirmasi Pengiriman", fontSize = 20.sp, color = Color(0xFF2196F3)) },
+            text = { Text("Apakah Anda yakin ingin mengirim jawaban kuesioner sekarang?", fontSize = 16.sp) },
             confirmButton = {
                 TextButton(
                     onClick = {
                         showDialog = false
-                        // Konversi answers ke string dan encode untuk URL
                         val answersString = answers.entries.joinToString(",") { "${it.key}:${it.value}" }
                         val encodedAnswers = URLEncoder.encode(answersString, StandardCharsets.UTF_8.toString())
                         Log.d("DASSQuestionnaire", "Navigating with answers: $answersString")
                         navController.navigate("dass_result/$encodedAnswers")
                     }
                 ) {
-                    Text("Ya")
+                    Text("Ya", color = Color(0xFF4CAF50), fontSize = 16.sp)
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { showDialog = false }
                 ) {
-                    Text("Tidak")
+                    Text("Tidak", color = Color.Gray, fontSize = 16.sp)
                 }
-            }
+            },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(16.dp)
         )
     }
 
-    // AlertDialog untuk konfirmasi kembali ke pengenalan
+    // AlertDialog untuk konfirmasi kembali
     if (showBackDialog) {
         AlertDialog(
             onDismissRequest = { showBackDialog = false },
-            title = { Text("Konfirmasi Kembali") },
-            text = { Text("Apakah Anda yakin ingin kembali ke halaman pengenalan? Progres tes akan hilang.") },
+            title = { Text("Konfirmasi Kembali", fontSize = 20.sp, color = Color(0xFF2196F3)) },
+            text = { Text("Apakah Anda yakin ingin kembali ke halaman pengenalan? Progres tes akan hilang.", fontSize = 16.sp) },
             confirmButton = {
                 TextButton(
                     onClick = {
                         showBackDialog = false
                         navController.navigate("dass_introduction") {
-                            // Hapus back stack kuesioner agar tidak kembali ke soal
                             popUpTo("dass_questionnaire") { inclusive = true }
                         }
                     }
                 ) {
-                    Text("Ya")
+                    Text("Ya", color = Color(0xFF4CAF50), fontSize = 16.sp)
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { showBackDialog = false }
                 ) {
-                    Text("Tidak")
+                    Text("Tidak", color = Color.Gray, fontSize = 16.sp)
                 }
-            }
+            },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(16.dp)
         )
     }
 }
