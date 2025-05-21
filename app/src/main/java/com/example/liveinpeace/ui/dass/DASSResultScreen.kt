@@ -1,10 +1,10 @@
 package com.example.liveinpeace.ui.dass
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -14,11 +14,11 @@ import androidx.navigation.NavController
 import android.util.Log
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun DASSResultScreen(navController: NavController, answersString: String) {
-    val greenColor = Color(0xFF4CAF50)
-
     // Decode answersString
     val decodedAnswers = try {
         URLDecoder.decode(answersString, StandardCharsets.UTF_8.toString())
@@ -55,26 +55,50 @@ fun DASSResultScreen(navController: NavController, answersString: String) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .background(Color(0xFFF5F7FA))
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Error",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "Gagal memuat hasil kuesioner. Silakan coba lagi.",
-                fontSize = 16.sp,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-            Button(
-                onClick = { navController.navigate("dass_introduction") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = greenColor)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
-                Text(text = "Kembali ke Pengenalan")
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Error",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFF44336)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Gagal memuat hasil kuesioner. Silakan coba lagi.",
+                        fontSize = 16.sp,
+                        color = Color(0xFF333333),
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(
+                        onClick = { navController.navigate("dass_introduction") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = "Kembali ke Pengenalan",
+                            color = Color.White,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
             }
         }
         return
@@ -116,67 +140,64 @@ fun DASSResultScreen(navController: NavController, answersString: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(Color(0xFFF5F7FA))
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Judul
         Text(
             text = "Hasil Kuesioner DASS-21",
             fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF2196F3),
+            modifier = Modifier.padding(bottom = 24.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
 
-        // Tampilkan skor dan interpretasi
-        Text(
-            text = "Depresi",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
+        // Skor dan interpretasi
+        ResultCard(
+            category = "Depresi",
+            score = depressionScore,
+            level = depressionLevel
         )
-        Text(
-            text = "Skor: $depressionScore ($depressionLevel)",
-            fontSize = 16.sp,
-            modifier = Modifier.padding(start = 8.dp)
+        ResultCard(
+            category = "Kecemasan",
+            score = anxietyScore,
+            level = anxietyLevel
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        ResultCard(
+            category = "Stres",
+            score = stressScore,
+            level = stressLevel
+        )
 
-        Text(
-            text = "Kecemasan",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "Skor: $anxietyScore ($anxietyLevel)",
-            fontSize = 16.sp,
-            modifier = Modifier.padding(start = 8.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Stres",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = "Skor: $stressScore ($stressLevel)",
-            fontSize = 16.sp,
-            modifier = Modifier.padding(start = 8.dp)
-        )
         Spacer(modifier = Modifier.height(24.dp))
 
         // Catatan tambahan
-        Text(
-            text = "Catatan: Skor dan interpretasi ini adalah hasil awal. Konsultasikan dengan profesional kesehatan mental untuk penilaian lebih lanjut.",
-            fontSize = 14.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        Button(
-            onClick = { navController.navigate("dass_introduction") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = greenColor)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
-            Text(text = "Kembali ke Pengenalan")
+            Text(
+                text = "Catatan: Skor dan interpretasi ini adalah hasil awal. Konsultasikan dengan profesional kesehatan mental untuk penilaian lebih lanjut.",
+                fontSize = 14.sp,
+                color = Color(0xFF333333),
+                modifier = Modifier.padding(16.dp),
+                textAlign = TextAlign.Center
+            )
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Tombol menggunakan NavigationButtons
+        NavigationButtons(
+            onBackClick = { navController.navigate("dass_introduction") },
+            onNextClick = {}, // Tidak digunakan
+            isFirstQuestion = true,
+            isLastQuestion = true,
+            isAnswered = true,
+            showBackDialog = {}
+        )
     }
 }

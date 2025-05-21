@@ -2,7 +2,6 @@ package com.example.liveinpeace.ui.dass
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -11,6 +10,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.shape.RoundedCornerShape
+
 
 @Composable
 fun QuestionItem(
@@ -94,6 +95,62 @@ fun NavigationButtons(
                 text = if (isLastQuestion) "Selesai" else "Next",
                 color = Color.White,
                 fontSize = 16.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun ResultCard(
+    category: String,
+    score: Int,
+    level: String,
+    modifier: Modifier = Modifier
+) {
+    val levelColor = when (level) {
+        "Normal" -> Color(0xFF4CAF50) // Hijau
+        "Ringan" -> Color(0xFF90CAF9) // Biru Muda
+        "Sedang" -> Color(0xFFFFCA28) // Kuning
+        "Berat" -> Color(0xFFFF9800) // Oranye
+        else -> Color(0xFFF44336) // Merah
+    }
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = category,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF2196F3)
+                )
+                Text(
+                    text = level,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = levelColor
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Skor: $score",
+                fontSize = 16.sp,
+                color = Color(0xFF333333)
             )
         }
     }
