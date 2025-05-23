@@ -5,9 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.compose.runtime.Composable
 
 class DASSQuestionnaireActivity : ComponentActivity() {
@@ -29,6 +31,15 @@ fun DASSNavHost() {
     NavHost(navController, startDestination = "dass_introduction") {
         composable("dass_introduction") { DASSIntroductionScreen(navController) }
         composable("dass_questionnaire") { DASSQuestionnaireScreen(navController) }
-        composable("dass_result") { DASSResultScreen(navController) }
+        composable(
+            route = "dass_result/{answers}",
+            arguments = listOf(navArgument("answers") {
+                type = NavType.StringType
+                defaultValue = "" // Tambahkan default value untuk mencegah null
+            })
+        ) { backStackEntry ->
+            val answersString = backStackEntry.arguments?.getString("answers") ?: ""
+            DASSResultScreen(navController, answersString)
+        }
     }
 }
