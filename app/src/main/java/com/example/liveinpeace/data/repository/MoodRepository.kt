@@ -10,14 +10,30 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class MoodRepository {
+<<<<<<< HEAD
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
+=======
+    private val db = FirebaseFirestore.getInstance()
+    private val userId = FirebaseAuth.getInstance().currentUser?.uid ?: throw IllegalStateException("User not logged in")
+>>>>>>> ed972b72df6b20771bd2d91a94b83da3970d14b7
 
     // Ganti List jadi List<MoodEntry>
     private val moodsFlow = MutableStateFlow<List<MoodEntry>>(emptyList())
 
+<<<<<<< HEAD
     init {
         listenToMoods()
+=======
+    suspend fun saveMood(mood: String) {
+        try{
+        val today = getTodayDate()
+        val moodEntry = MoodEntry(mood = mood, timestamp = System.currentTimeMillis())
+        moodCollection.document(today).set(moodEntry).await()
+    } catch (e: Exception){
+        throw Exception("Failed to save mood: ${e.message}")
+    }
+>>>>>>> ed972b72df6b20771bd2d91a94b83da3970d14b7
     }
 
     private fun listenToMoods() {
