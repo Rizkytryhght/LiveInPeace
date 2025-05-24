@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
 
-
 @Composable
 fun QuestionItem(
     option: String,
@@ -92,7 +91,7 @@ fun NavigationButtons(
             enabled = isAnswered
         ) {
             Text(
-                text = if (isLastQuestion) "Selesai" else "Next",
+                text = if (isLastQuestion) "Submit" else "Next",
                 color = Color.White,
                 fontSize = 16.sp
             )
@@ -108,11 +107,11 @@ fun ResultCard(
     modifier: Modifier = Modifier
 ) {
     val levelColor = when (level) {
-        "Normal" -> Color(0xFF4CAF50) // Hijau
-        "Ringan" -> Color(0xFF90CAF9) // Biru Muda
-        "Sedang" -> Color(0xFFFFCA28) // Kuning
-        "Berat" -> Color(0xFFFF9800) // Oranye
-        else -> Color(0xFFF44336) // Merah
+        "Normal" -> Color(0xFF4CAF50)
+        "Ringan" -> Color(0xFF90CAF9)
+        "Sedang" -> Color(0xFFFFCA28)
+        "Berat" -> Color(0xFFFF9800)
+        else -> Color(0xFFF44336)
     }
 
     Card(

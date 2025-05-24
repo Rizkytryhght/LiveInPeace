@@ -85,7 +85,9 @@ fun DASSResultScreen(navController: NavController, answersString: String) {
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Button(
-                        onClick = { navController.navigate("dass_introduction") },
+                        onClick = { navController.navigate("dass_introduction") {
+                            popUpTo("dass_introduction") { inclusive = false }
+                        } },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
@@ -190,14 +192,25 @@ fun DASSResultScreen(navController: NavController, answersString: String) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Tombol menggunakan NavigationButtons
-        NavigationButtons(
-            onBackClick = { navController.navigate("dass_introduction") },
-            onNextClick = {}, // Tidak digunakan
-            isFirstQuestion = true,
-            isLastQuestion = true,
-            isAnswered = true,
-            showBackDialog = {}
-        )
+        // Tombol Kembali
+        Button(
+            onClick = {
+                Log.d("DASSResultScreen", "Kembali button clicked, navigating to dass_introduction")
+                navController.navigate("dass_introduction") {
+                    popUpTo("dass_result/{answers}") { inclusive = true } // Membersihkan stack
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(
+                text = "Kembali",
+                color = Color.White,
+                fontSize = 16.sp
+            )
+        }
     }
 }

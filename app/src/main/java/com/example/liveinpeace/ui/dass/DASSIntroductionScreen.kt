@@ -1,196 +1,193 @@
 package com.example.liveinpeace.ui.dass
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun DASSIntroductionScreen(navController: NavController) {
     var currentPage by remember { mutableStateOf(1) }
     val totalPages = 3
     val greenColor = Color(0xFF4CAF50)
+    val backgroundColor = Color(0xFFF5F7FA)
+
+    // Mendapatkan context untuk memanggil finish() pada activity
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center
+            .background(backgroundColor)
+            .padding(horizontal = 16.dp, vertical = 24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        when (currentPage) {
-            1 -> {
-                Text(
-                    text = "Untuk apa kuesioner ini?",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
+        // Indikator Halaman
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            for (i in 1..totalPages) {
+                Box(
+                    modifier = Modifier
+                        .size(10.dp)
+                        .padding(4.dp)
+                        .background(
+                            color = if (i == currentPage) greenColor else Color.Gray.copy(alpha = 0.5f),
+                            shape = RoundedCornerShape(5.dp)
+                        )
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Pengisian kuesioner ini sebagai bagian dari proses skrining awal kondisi psikologis\n" +
-                            "Khususnya yang berkaitan dengan depresi, kecemasan, dan stres yang mungkin sedang kamu alami.\n" +
-                            "Instrumen yang digunakan adalah DASS-21 yang merupakan versi singkat dari versi normalnya.\n" +
-                            "Depression Anxiety Stress Scales (DASS) telah terbukti valid dan reliabel dalam mengukur gejala emosional tersebut.",
-                    fontSize = 16.sp
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "DASS-21 adalah alat ukur psikologis yang umum digunakan untuk orang dewasa, termasuk mahasiswa, dan terdiri dari 21 pertanyaan, " +
-                            "yang mengacu pada pengalaman anda selama 7 hari terakhir.",
-                    fontSize = 16.sp
-                )
-                Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
 
-                if (currentPage > 1) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Button(
-                            onClick = { currentPage-- },
-                            modifier = Modifier.weight(1f).padding(end = 8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = greenColor)
-                        ) {
-                            Text(text = "Back")
-                        }
-                        Button(
-                            onClick = {
-                                if (currentPage < totalPages) {
-                                    currentPage++
-                                } else {
-                                    navController.navigate("dass_questionnaire")
-                                }
-                            },
-                            modifier = Modifier.weight(1f).padding(start = 8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = greenColor)
-                        ) {
-                            Text(text = if (currentPage < totalPages) "Next" else "Mulai Tes")
-                        }
+        // Konten dalam Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp)
+                .weight(1f, fill = false),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                when (currentPage) {
+                    1 -> {
+                        Text(
+                            text = "Untuk Apa Kuesioner Ini?",
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(
+                            text = "Pengisian kuesioner ini sebagai bagian dari proses skrining awal kondisi psikologis, khususnya yang berkaitan dengan depresi, kecemasan, dan stres yang mungkin sedang kamu alami. Instrumen yang digunakan adalah DASS-21, versi singkat dari DASS normal, yang telah terbukti valid dan reliabel dalam mengukur gejala emosional tersebut.",
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "DASS-21 adalah alat ukur psikologis yang umum digunakan untuk orang dewasa, termasuk mahasiswa, dan terdiri dari 21 pertanyaan berdasarkan pengalaman Anda selama 7 hari terakhir.",
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
                     }
-                } else {
-                    Button(
-                        onClick = { currentPage++ },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = greenColor)
-                    ) {
-                        Text(text = "Next")
+                    2 -> {
+                        Text(
+                            text = "Privasi Data",
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(
+                            text = "Kerahasiaan data Anda akan dijamin sepenuhnya. Informasi yang diberikan tidak akan disebarluaskan dan hanya akan digunakan untuk keperluan asesmen psikologis awal.",
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    3 -> {
+                        Text(
+                            text = "Instruksi Pengisian",
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(
+                            text = "Anda akan diminta mengisi setiap soal dengan mengklik pilihan yang paling sesuai dengan pengalaman Anda selama 1 minggu terakhir. Terdapat empat pilihan jawaban:\n" +
+                                    "0 - Tidak sesuai dengan saya sama sekali, atau tidak pernah\n" +
+                                    "1 - Sesuai dengan saya sampai tingkat tertentu, atau kadang-kadang\n" +
+                                    "2 - Sesuai dengan saya sampai batas yang dapat dipertimbangkan, atau sering\n" +
+                                    "3 - Sangat sesuai dengan saya, atau sangat sering",
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = "Tidak ada jawaban benar atau salah, jadi mohon isi dengan jujur sesuai kondisi yang Anda alami.",
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }
-            2 -> {
-                Text(
-                    text = "Privasi data",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text =  "Kerahasiaan data Anda akan dijamin sepenuhnya.\n" +
-                            "Informasi yang diberikan tidak akan disebarluaskan dan hanya akan digunakan untuk keperluan asesmen psikologis awal.",
-                    fontSize = 16.sp
-                )
-                Spacer(modifier = Modifier.height(24.dp))
+        }
 
-                if (currentPage > 1) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Button(
-                            onClick = { currentPage-- },
-                            modifier = Modifier.weight(1f).padding(end = 8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = greenColor)
-                        ) {
-                            Text(text = "Back")
-                        }
-                        Button(
-                            onClick = {
-                                if (currentPage < totalPages) {
-                                    currentPage++
-                                } else {
-                                    navController.navigate("dass_questionnaire") // Ke halaman tes
-                                }
-                            },
-                            modifier = Modifier.weight(1f).padding(start = 8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = greenColor)
-                        ) {
-                            Text(text = if (currentPage < totalPages) "Next" else "Mulai Tes")
-                        }
+        // Tombol Navigasi
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Tombol Back selalu ada, di halaman 1 akan kembali ke FeaturesListActivity
+            Button(
+                onClick = {
+                    if (currentPage == 1) {
+                        // Kembali ke FeaturesListActivity dengan memanggil finish()
+                        (context as? androidx.activity.ComponentActivity)?.finish()
+                    } else {
+                        currentPage--
                     }
-                } else {
-                    Button(
-                        onClick = { currentPage++ },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = greenColor)
-                    ) {
-                        Text(text = "Next")
-                    }
-                }
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = greenColor),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+            ) {
+                Text(text = "Back", color = Color.White, fontSize = 16.sp)
             }
-            3 -> {
-                Text(
-                    text = "Instruksi pengisian",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text =  "Anda akan diminta untuk mengisi setiap soal yang ada, dengan mengklik pilihan yang paling sesuai dengan pengalaman anda selama 1 minggu terakhir.  \n" +
-                            "Terdapat empat pilihan jawaban yang disediakan untuk setiap pertanyaan yaitu:\n" +
-                            "0 - Tidak sesuai dengan saya sama sekali, atau tidak pernah\n" +
-                            "1 - Sesuai dengan saya sampai tingkat tertentu, atau Kadang-kadang\n" +
-                            "2 - Sesuai dengan saya sampai batas yang dapat dipertimbangkan, atau sering\n" +
-                            "3 - Sangat sesuai dengan saya, atau sangat sering",
-                    fontSize = 16.sp
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text =  "Tidak ada jawaban yang benar ataupun salah, karena itu mohon isi dengan jujur sesuai dengan kondisi yang anda alami.\n",
-                    fontSize = 16.sp
-                )
-                Spacer(modifier = Modifier.height(24.dp))
 
-                if (currentPage > 1) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Button(
-                            onClick = { currentPage-- },
-                            modifier = Modifier.weight(1f).padding(end = 8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = greenColor)
-                        ) {
-                            Text(text = "Back")
-                        }
-                        Button(
-                            onClick = {
-                                if (currentPage < totalPages) {
-                                    currentPage++
-                                } else {
-                                    navController.navigate("dass_questionnaire")
-                                }
-                            },
-                            modifier = Modifier.weight(1f).padding(start = 8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = greenColor)
-                        ) {
-                            Text(text = if (currentPage < totalPages) "Next" else "Mulai Tes")
-                        }
+            // Tombol Next atau Mulai Tes
+            Button(
+                onClick = {
+                    if (currentPage < totalPages) {
+                        currentPage++
+                    } else {
+                        navController.navigate("dass_questionnaire")
                     }
-                } else {
-                    Button(
-                        onClick = { currentPage++ },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = greenColor)
-                    ) {
-                        Text(text = "Mulai Tes")
-                    }
-                }
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = greenColor),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+            ) {
+                Text(
+                    text = if (currentPage < totalPages) "Next" else "Mulai Tes",
+                    color = Color.White,
+                    fontSize = 16.sp
+                )
             }
         }
     }
