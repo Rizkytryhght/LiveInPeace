@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 
 @Composable
@@ -19,7 +20,10 @@ fun DASSIntroductionScreen(navController: NavController) {
     var currentPage by remember { mutableStateOf(1) }
     val totalPages = 3
     val greenColor = Color(0xFF4CAF50)
-    val backgroundColor = Color(0xFFF5F7FA) // Latar belakang lembut
+    val backgroundColor = Color(0xFFF5F7FA)
+
+    // Mendapatkan context untuk memanggil finish() pada activity
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -115,7 +119,7 @@ fun DASSIntroductionScreen(navController: NavController) {
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                         Text(
-                            text = "Anda akan diminta mengisi setiap soal dengan mengklik pilihan yang paling sesuai dengan pengalaman Anda selama 1 minggu terakhir. Terdapat empat pilihan jawaban:\n\n" +
+                            text = "Anda akan diminta mengisi setiap soal dengan mengklik pilihan yang paling sesuai dengan pengalaman Anda selama 1 minggu terakhir. Terdapat empat pilihan jawaban:\n" +
                                     "0 - Tidak sesuai dengan saya sama sekali, atau tidak pernah\n" +
                                     "1 - Sesuai dengan saya sampai tingkat tertentu, atau kadang-kadang\n" +
                                     "2 - Sesuai dengan saya sampai batas yang dapat dipertimbangkan, atau sering\n" +
@@ -143,19 +147,27 @@ fun DASSIntroductionScreen(navController: NavController) {
                 .padding(top = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            if (currentPage > 1) {
-                Button(
-                    onClick = { currentPage-- },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = greenColor),
-                    shape = RoundedCornerShape(12.dp),
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
-                ) {
-                    Text(text = "Back", color = Color.White, fontSize = 16.sp)
-                }
+            // Tombol Back selalu ada, di halaman 1 akan kembali ke FeaturesListActivity
+            Button(
+                onClick = {
+                    if (currentPage == 1) {
+                        // Kembali ke FeaturesListActivity dengan memanggil finish()
+                        (context as? androidx.activity.ComponentActivity)?.finish()
+                    } else {
+                        currentPage--
+                    }
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = greenColor),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+            ) {
+                Text(text = "Back", color = Color.White, fontSize = 16.sp)
             }
+
+            // Tombol Next atau Mulai Tes
             Button(
                 onClick = {
                     if (currentPage < totalPages) {
@@ -166,7 +178,7 @@ fun DASSIntroductionScreen(navController: NavController) {
                 },
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = if (currentPage > 1) 8.dp else 0.dp),
+                    .padding(start = 8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = greenColor),
                 shape = RoundedCornerShape(12.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
