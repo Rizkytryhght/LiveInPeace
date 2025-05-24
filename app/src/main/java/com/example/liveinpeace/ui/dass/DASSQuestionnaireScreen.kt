@@ -14,6 +14,7 @@ import androidx.navigation.NavController
 import android.util.Log
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -68,10 +69,10 @@ fun DASSQuestionnaireScreen(navController: NavController) {
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Pertanyaan dalam Card
         Card(
             modifier = Modifier
                 .fillMaxWidth()
+                .wrapContentHeight()
                 .padding(bottom = 24.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             shape = RoundedCornerShape(12.dp),
@@ -84,9 +85,13 @@ fun DASSQuestionnaireScreen(navController: NavController) {
                 modifier = Modifier
                     .padding(20.dp)
                     .fillMaxWidth(),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                maxLines = 6,
+                overflow = TextOverflow.Ellipsis
             )
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Opsi jawaban
         val options = listOf(
