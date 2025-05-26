@@ -31,28 +31,26 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = "21"
+        jvmTarget = "1.8"
     }
 
     buildFeatures {
         compose = true
+        viewBinding = true
     }
 
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
     }
-
-    viewBinding {
-        enable = true
-    }
 }
 
 dependencies {
+    // AndroidX & Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -62,14 +60,6 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.appcompat)
-    implementation(libs.firebase.database)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
@@ -77,51 +67,66 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.database)
 
-    // Room Database
-    implementation(libs.room.runtime)
-    kapt(libs.room.compiler)
-    implementation("androidx.room:room-ktx:2.6.1")
+    // Room
     implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
 
     // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    // Coil untuk gambar di Compose
+    // Coil for images
     implementation(libs.coil.compose)
 
     // UI Components
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation(libs.material)
+    implementation("com.google.android.material:material:1.9.0")
     implementation("io.github.chaosleung:pinview:1.4.4")
     implementation("androidx.cardview:cardview:1.0.0")
-    implementation(libs.recyclerview)
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
     // Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.7.0")
-
-    // DataStore dan Lifecycle
-    implementation(libs.datastore.preferences)
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
-    implementation("androidx.activity:activity-ktx:1.7.2")
-
-    // Jetpack Compose Navigation
     implementation(libs.androidx.navigation.compose)
 
-    // MPAndroidChart untuk grafik
-    implementation(libs.mpandroidchart)
+    // DataStore & Lifecycle
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+    implementation("androidx.activity:activity-ktx:1.7.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+
+    // MPAndroidChart for Mood Chart
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("androidx.compose.material:material-icons-extended")
 
-    // Tambahan Compose terbaru
+    // Jetpack Compose Extensions
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.compose.foundation:foundation:1.5.4")
     implementation("androidx.compose.ui:ui-tooling:1.5.4")
     implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.material:material:1.6.0")
+    implementation("androidx.activity:activity-compose:1.9.0")
+
+    // Play Services
+    implementation("com.google.android.gms:play-services-base:18.5.0")
+
+    // Desugaring
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
+    // Testing
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }

@@ -1,6 +1,8 @@
 package com.example.liveinpeace.ui.note
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,8 +39,6 @@ class NoteAdapter(
         holder.titleTextView.text = note.title
         holder.dateTextView.text = note.date
         holder.timeTextView.text = note.time
-
-        // Tentukan nama hari berdasarkan tanggal
         holder.dayTextView.text = getDayName(note.date)
 
         holder.itemView.setOnClickListener {
@@ -46,7 +46,7 @@ class NoteAdapter(
         }
 
         holder.deleteButton.setOnClickListener {
-            onDeleteClick(note)
+            showDeleteConfirmationDialog(holder.itemView.context, note)
         }
     }
 
@@ -67,7 +67,25 @@ class NoteAdapter(
             dayFormat.format(date ?: Date()).uppercase(Locale("id", "ID"))
         } catch (e: Exception) {
             e.printStackTrace()
-            return "Tidak diketahui"
+            "Tidak diketahui"
         }
+    }
+
+    private fun showDeleteConfirmationDialog(context: android.content.Context, note: Note) {
+        AlertDialog.Builder(context)
+            .setTitle("Hapus Catatan")
+            .setMessage("Catatan '${note.title}' akan dihapus permanen")
+            .setIcon(R.drawable.ic_warning)
+            .setPositiveButton("Hapus") { dialog, _ ->
+                onDeleteClick(note)
+                dialog.dismiss()
+            }
+            .setNegativeButton("Batal", null)
+            .create()
+            .apply {
+                setCanceledOnTouchOutside(false)
+                show()
+                getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.RED) // Perhatikan typo di sini (POSITIVE bukan POSITIVE)
+            }
     }
 }

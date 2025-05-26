@@ -12,8 +12,6 @@ import java.util.*
 class MoodRepository {
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
-
-    // Ganti List jadi List<MoodEntry>
     private val moodsFlow = MutableStateFlow<List<MoodEntry>>(emptyList())
 
     init {
@@ -34,11 +32,11 @@ class MoodRepository {
                     try {
                         doc.toObject(MoodEntry::class.java)
                     } catch (e: Exception) {
+                        println("Error parsing mood entry: ${e.message}")
                         null
                     }
                 } ?: emptyList()
 
-                // update StateFlow
                 moodsFlow.value = moodList
             }
     }
@@ -63,7 +61,7 @@ class MoodRepository {
                 .await()
         } catch (e: Exception) {
             println("Error saving mood: ${e.message}")
-            throw e
+            throw Exception("Failed to save mood: ${e.message}")
         }
     }
 
