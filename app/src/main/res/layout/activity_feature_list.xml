@@ -3,31 +3,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="#EFF0F6"
+    android:background="#E6F0FA"
     android:paddingTop="16dp">
 
-    <!-- Judul -->
+    <!-- Judul dengan Nuansa Islami -->
     <TextView
         android:id="@+id/textViewFitur"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Ruang Tenang"
-        android:textSize="20sp"
+        android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="#2E7D32"
+        android:fontFamily="sans-serif-condensed"
         android:layout_marginTop="40dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Dekorasi Garis (Mengganti dengan View Sederhana) -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="#6B705C"
+        app:layout_constraintTop_toBottomOf="@id/textViewFitur"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
     <!-- Checklist Ibadah Card -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardChecklistIbadah"
         android:layout_width="0dp"
-        android:layout_height="150dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="8dp"
+        android:layout_height="180dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="6dp"
         app:cardBackgroundColor="#A5D6A7"
+        app:cardPreventCornerOverlap="false"
         app:layout_constraintTop_toBottomOf="@id/textViewFitur"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/reminderCard"
@@ -39,7 +51,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:padding="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -52,9 +65,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Checklist Ibadah"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#000000" />
+                android:textColor="#000000"
+                android:gravity="center" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
@@ -62,10 +76,11 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/reminderCard"
         android:layout_width="0dp"
-        android:layout_height="150dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="8dp"
+        android:layout_height="180dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="6dp"
         app:cardBackgroundColor="#A5D6A7"
+        app:cardPreventCornerOverlap="false"
         app:layout_constraintTop_toBottomOf="@id/textViewFitur"
         app:layout_constraintStart_toEndOf="@id/cardChecklistIbadah"
         app:layout_constraintEnd_toEndOf="parent"
@@ -77,7 +92,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:padding="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -90,30 +106,34 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Reminder Ibadah"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#000000" />
+                android:textColor="#000000"
+                android:gravity="center" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-<!-- DASS Test Card -->
+    <!-- DASS Test Card -->
     <androidx.cardview.widget.CardView
         android:id="@+id/cardDASSQuestionnaire"
         android:layout_width="0dp"
-        android:layout_height="150dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="8dp"
+        android:layout_height="180dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="6dp"
         app:cardBackgroundColor="#A5D6A7"
+        app:cardPreventCornerOverlap="false"
         app:layout_constraintTop_toBottomOf="@id/cardChecklistIbadah"
         app:layout_constraintStart_toStartOf="@id/cardChecklistIbadah"
-        app:layout_constraintEnd_toEndOf="@id/cardChecklistIbadah"
-        android:layout_marginTop="16dp">
+        app:layout_constraintEnd_toStartOf="@id/cardMoodTracker"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:padding="12dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -126,9 +146,50 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Test DASS"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#000000" />
+                android:textColor="#000000"
+                android:gravity="center" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Mood Tracker Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardMoodTracker"
+        android:layout_width="0dp"
+        android:layout_height="180dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="6dp"
+        app:cardBackgroundColor="#A5D6A7"
+        app:cardPreventCornerOverlap="false"
+        app:layout_constraintTop_toBottomOf="@id/reminderCard"
+        app:layout_constraintStart_toEndOf="@id/cardDASSQuestionnaire"
+        app:layout_constraintEnd_toEndOf="@id/reminderCard"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⭐"
+                android:textSize="70sp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mood Tracker"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:gravity="center" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

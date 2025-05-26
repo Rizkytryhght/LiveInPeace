@@ -22,7 +22,6 @@ fun DASSIntroductionScreen(navController: NavController) {
     val greenColor = Color(0xFF4CAF50)
     val backgroundColor = Color(0xFFF5F7FA)
 
-    // Mendapatkan context untuk memanggil finish() pada activity
     val context = LocalContext.current
 
     Column(
@@ -147,12 +146,11 @@ fun DASSIntroductionScreen(navController: NavController) {
                 .padding(top = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Tombol Back selalu ada, di halaman 1 akan kembali ke FeaturesListActivity
+            // Tombol Back selalu ada, di halaman 1 akan kembali ke dass_options
             Button(
                 onClick = {
                     if (currentPage == 1) {
-                        // Kembali ke FeaturesListActivity dengan memanggil finish()
-                        (context as? androidx.activity.ComponentActivity)?.finish()
+                        navController.popBackStack("dass_options", false)
                     } else {
                         currentPage--
                     }
