@@ -100,6 +100,8 @@ class ProfileActivity : AppCompatActivity() {
     private fun updateProfileUI(profile: ProfileModel) {
         binding.profileName.text = "${profile.firstName} ${profile.lastName}"
         binding.profileUsername.text = "${profile.email}"
+        binding.profileGender.text = profile.gender ?: "Tidak ditentukan"
+        binding.profilePhone.text = profile.phoneNumber ?: "Tidak ditentukan"
         if (profile.profileImagePath.isNotBlank()) {
             try {
                 binding.profileImage.setImageURI(Uri.fromFile(File(profile.profileImagePath)))

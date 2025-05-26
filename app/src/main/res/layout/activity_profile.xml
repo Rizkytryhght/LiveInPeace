@@ -53,26 +53,36 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_bg"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:padding="24dp"
-                android:gravity="center_vertical"
+                android:gravity="center_horizontal"
                 android:elevation="10dp"
                 android:outlineProvider="background"
                 android:clipToOutline="true">
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/profileImage"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:layout_marginEnd="20dp"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_marginBottom="16dp"
                     app:civ_border_width="2dp"
                     app:civ_border_color="#FFFFFF" />
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:gravity="start">
+
+                    <!-- Label dan Nama -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nama"
+                        android:textColor="#CCCCCC"
+                        android:textSize="14sp"
+                        android:textStyle="bold"                        
+                        android:layout_marginBottom="4dp" />
 
                     <TextView
                         android:id="@+id/profileName"
@@ -80,10 +90,18 @@
                         android:layout_height="wrap_content"
                         android:text="Eren Yeager"
                         android:textColor="#FFFFFF"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
+                        android:textSize="16sp"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Label dan Email -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Email"
+                        android:textColor="#CCCCCC"
+                        android:textSize="14sp"
+                        android:textStyle="bold"                        
+                        android:layout_marginBottom="4dp" />
 
                     <TextView
                         android:id="@+id/profileUsername"
@@ -92,15 +110,53 @@
                         android:text="E.Yeager"
                         android:textColor="#FFFFFF"
                         android:textSize="16sp"
-                        android:layout_marginTop="4dp"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Label dan Jenis Kelamin -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Jenis Kelamin"
+                        android:textColor="#CCCCCC"
+                        android:textSize="14sp"
+                        android:textStyle="bold"                        
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/profileGender"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tidak ditentukan"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Label dan Nomor Telepon -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nomor Telepon"
+                        android:textColor="#CCCCCC"
+                        android:textSize="14sp"
+                        android:textStyle="bold"                        
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/profilePhone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tidak ditentukan"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="12dp" />
                 </LinearLayout>
 
                 <ImageView
                     android:id="@+id/editProfileIcon"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="16dp"
                     android:src="@drawable/edit"
                     app:tint="@android:color/white" />
             </LinearLayout>
@@ -117,37 +173,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingVertical="20dp"
-                        android:paddingHorizontal="16dp">
-
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@drawable/user"
-                            android:layout_marginEnd="20dp"
-                            android:layout_marginStart="16dp" />
-
-                        <TextView
-                            android:id="@+id/myAccountOption"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="My Account"
-                            android:textSize="18sp"
-                            android:textColor="#181D27" />
-                    </LinearLayout>
-
-                    <!-- Divider -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#E0E0E0"
-                        android:layout_marginHorizontal="16dp" />
 
                     <LinearLayout
                         android:id="@+id/logoutContainer"
