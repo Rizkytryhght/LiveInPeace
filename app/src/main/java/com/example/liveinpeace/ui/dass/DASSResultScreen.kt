@@ -18,6 +18,7 @@ import androidx.navigation.NavController
 import com.example.liveinpeace.data.local.room.DASSScore
 import com.example.liveinpeace.data.repository.DASSRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.URLDecoder
@@ -27,7 +28,8 @@ import java.nio.charset.StandardCharsets
 fun DASSResultScreen(navController: NavController, answersString: String) {
     val context = navController.context
     val repository = DASSRepository(
-        com.example.liveinpeace.data.local.room.AppDatabase.getDatabase(context).dassScoreDao()
+        com.example.liveinpeace.data.local.room.AppDatabase.getDatabase(context).dassScoreDao(),
+        FirebaseFirestore.getInstance()
     )
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "anonymous"
 
