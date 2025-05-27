@@ -2,23 +2,25 @@ package com.example.liveinpeace.ui.reminder
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.liveinpeace.viewModel.ReminderViewModel
 import kotlinx.coroutines.delay
@@ -30,6 +32,7 @@ import kotlin.math.sin
 @Composable
 fun ReminderScreen() {
     val viewModel: ReminderViewModel = viewModel()
+    val context = LocalContext.current
 
     // Collect prayer times
     val fajrTime by viewModel.fajrTime.collectAsState()
@@ -77,184 +80,205 @@ fun ReminderScreen() {
         secondRotation.snapTo((seconds / 60) * 360)
     }
 
-    LazyColumn(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .background(Color.White) // Background putih untuk konsistensi
+            .padding(16.dp)
     ) {
-        item {
-            // Bikin area klik lebih besar dan jelas
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        showClock = !showClock
-                        println("DEBUG: Klik Reminder Ibadah, showClock: $showClock")
-                    }
-                    .padding(8.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (showClock) Color(0xFFE8F5E9) else Color.White // Background putih biar kontras
-                )
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "Reminder Ibadah",
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = Color(0xFF4CAF50), // Hijau
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        if (!showClock){
-                            Text(
-                                text = "Klik untuk lihat jam",
-                                color = Color.Gray,
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
-                    }
-                }
-            }
+        // Tombol Back
+        IconButton(
+            onClick = {
+                (context as? androidx.activity.ComponentActivity)?.finish()
+            },
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .size(40.dp)
+                .clip(MaterialTheme.shapes.small)
+                .background(Color.White.copy(alpha = 0.9f))
+        ) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Kembali",
+                tint = Color(0xFF2E7D32), // Hijau sesuai tema
+                modifier = Modifier.size(24.dp)
+            )
         }
 
-        // Tampilkan jam animasi saat showClock true
-        if (showClock) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 48.dp), // Tambah padding biar nggak ketutup tombol Back
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             item {
-                // Tambah background biar jam kelihatan
-                Box(
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.White) // Background putih untuk kontras
-                        .padding(8.dp)
-                ) {
-                    ClockAnimation(
-                        hourRotation = hourRotation,
-                        minuteRotation = minuteRotation,
-                        secondRotation = secondRotation,
-                        onAnimationEnd = {
-                            showClock = false
-                            println("DEBUG: Animasi selesai, showClock set to false")
+                        .clickable {
+                            showClock = !showClock
+                            println("DEBUG: Klik Reminder Ibadah, showClock: $showClock")
                         }
+                        .padding(8.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (showClock) Color(0xFFE8F5E9) else Color.White
                     )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                text = "Reminder Ibadah",
+                                style = MaterialTheme.typography.headlineLarge,
+                                color = Color(0xFF4CAF50),
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            if (!showClock) {
+                                Text(
+                                    text = "Klik untuk lihat jam",
+                                    color = Color.Gray,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+                        }
+                    }
                 }
             }
-        }
 
-        // Prayer reminders
-        item {
-            Text(
-                text = "Waktu Sholat",
-                style = MaterialTheme.typography.titleMedium,
-                color = Color(0xFF4CAF50), // Hijau
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-        }
-
-        item {
-            ReminderItem(
-                title = "Subuh ($fajrTime)",
-                isChecked = fajrEnabled,
-                onCheckedChange = {
-                    fajrEnabled = it
-                    viewModel.setFajrEnabled(it)
+            if (showClock) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.White)
+                            .padding(8.dp)
+                    ) {
+                        ClockAnimation(
+                            hourRotation = hourRotation,
+                            minuteRotation = minuteRotation,
+                            secondRotation = secondRotation,
+                            onAnimationEnd = {
+                                showClock = false
+                                println("DEBUG: Animasi selesai, showClock set to false")
+                            }
+                        )
+                    }
                 }
-            )
-        }
+            }
 
-        item {
-            ReminderItem(
-                title = "Dzuhur ($dhuhrTime)",
-                isChecked = dhuhrEnabled,
-                onCheckedChange = {
-                    dhuhrEnabled = it
-                    viewModel.setDhuhrEnabled(it)
-                }
-            )
-        }
-
-        item {
-            ReminderItem(
-                title = "Ashar ($asrTime)",
-                isChecked = asrEnabled,
-                onCheckedChange = {
-                    asrEnabled = it
-                    viewModel.setAsrEnabled(it)
-                }
-            )
-        }
-
-        item {
-            ReminderItem(
-                title = "Maghrib ($maghribTime)",
-                isChecked = maghribEnabled,
-                onCheckedChange = {
-                    maghribEnabled = it
-                    viewModel.setMaghribEnabled(it)
-                }
-            )
-        }
-
-        item {
-            ReminderItem(
-                title = "Isya ($ishaTime)",
-                isChecked = ishaEnabled,
-                onCheckedChange = {
-                    ishaEnabled = it
-                    viewModel.setIshaEnabled(it)
-                }
-            )
-        }
-
-        // Dzikir reminders section
-        item {
-            Text(
-                text = "Waktu Dzikir",
-                style = MaterialTheme.typography.titleMedium,
-                color = Color(0xFF4CAF50), // Hijau
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-        }
-
-        item {
-            ReminderItem(
-                title = "Dzikir Pagi ($dzikirPagiTime)",
-                isChecked = pagiEnabled,
-                onCheckedChange = {
-                    pagiEnabled = it
-                    viewModel.setDzikirPagiEnabled(it)
-                }
-            )
-        }
-
-        item {
-            ReminderItem(
-                title = "Dzikir Petang ($dzikirPetangTime)",
-                isChecked = petangEnabled,
-                onCheckedChange = {
-                    petangEnabled = it
-                    viewModel.setDzikirPetangEnabled(it)
-                }
-            )
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = { viewModel.fetchTimings() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50), // Hijau
-                    contentColor = Color.White
+            item {
+                Text(
+                    text = "Waktu Sholat",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color(0xFF4CAF50),
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
-            ) {
-                Text("Refresh Jadwal")
+            }
+
+            item {
+                ReminderItem(
+                    title = "Subuh ($fajrTime)",
+                    isChecked = fajrEnabled,
+                    onCheckedChange = {
+                        fajrEnabled = it
+                        viewModel.setFajrEnabled(it)
+                    }
+                )
+            }
+
+            item {
+                ReminderItem(
+                    title = "Dzuhur ($dhuhrTime)",
+                    isChecked = dhuhrEnabled,
+                    onCheckedChange = {
+                        dhuhrEnabled = it
+                        viewModel.setDhuhrEnabled(it)
+                    }
+                )
+            }
+
+            item {
+                ReminderItem(
+                    title = "Ashar ($asrTime)",
+                    isChecked = asrEnabled,
+                    onCheckedChange = {
+                        asrEnabled = it
+                        viewModel.setAsrEnabled(it)
+                    }
+                )
+            }
+
+            item {
+                ReminderItem(
+                    title = "Maghrib ($maghribTime)",
+                    isChecked = maghribEnabled,
+                    onCheckedChange = {
+                        maghribEnabled = it
+                        viewModel.setMaghribEnabled(it)
+                    }
+                )
+            }
+
+            item {
+                ReminderItem(
+                    title = "Isya ($ishaTime)",
+                    isChecked = ishaEnabled,
+                    onCheckedChange = {
+                        ishaEnabled = it
+                        viewModel.setIshaEnabled(it)
+                    }
+                )
+            }
+
+            item {
+                Text(
+                    text = "Waktu Dzikir",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color(0xFF4CAF50),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+
+            item {
+                ReminderItem(
+                    title = "Dzikir Pagi ($dzikirPagiTime)",
+                    isChecked = pagiEnabled,
+                    onCheckedChange = {
+                        pagiEnabled = it
+                        viewModel.setDzikirPagiEnabled(it)
+                    }
+                )
+            }
+
+            item {
+                ReminderItem(
+                    title = "Dzikir Petang ($dzikirPetangTime)",
+                    isChecked = petangEnabled,
+                    onCheckedChange = {
+                        petangEnabled = it
+                        viewModel.setDzikirPetangEnabled(it)
+                    }
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = { viewModel.fetchTimings() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF4CAF50),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Refresh Jadwal")
+                }
             }
         }
     }
@@ -267,8 +291,6 @@ fun ClockAnimation(
     secondRotation: Animatable<Float, AnimationVector1D>,
     onAnimationEnd: () -> Unit = {}
 ) {
-//    var animationStarted by remember { mutableStateOf(false) }
-
     LaunchedEffect(Unit) {
         while (true) {
             val currentCalendar = Calendar.getInstance()
@@ -280,7 +302,7 @@ fun ClockAnimation(
             minuteRotation.snapTo((minutes / 60) * 360)
             secondRotation.snapTo((seconds / 60) * 360)
 
-            delay(1000) // Update setiap detik
+            delay(1000)
         }
     }
 
@@ -295,14 +317,12 @@ fun ClockAnimation(
             val radius = size.minDimension / 2
             val center = Offset(size.width / 2, size.height / 2)
 
-            // Gambar lingkaran jam
             drawCircle(
-                color = Color.White, // Putih biar kontras
+                color = Color.White,
                 radius = radius,
                 center = center
             )
 
-            // Gambar angka (sederhana)
             for (i in 1..12) {
                 val angle = (i - 3) * 30 * PI.toFloat() / 180
                 val x = center.x + cos(angle) * (radius * 0.8f)
@@ -319,39 +339,35 @@ fun ClockAnimation(
                 )
             }
 
-            // Gambar jarum jam
             rotate(hourRotation.value, pivot = center) {
                 drawLine(
-                    color = Color(0xFF4CAF50), // Hijau
+                    color = Color(0xFF4CAF50),
                     start = center,
                     end = Offset(center.x, center.y - radius * 0.5f),
                     strokeWidth = 6f
                 )
             }
 
-            // Gambar jarum menit
             rotate(minuteRotation.value, pivot = center) {
                 drawLine(
-                    color = Color(0xFF4CAF50), // Hijau
+                    color = Color(0xFF4CAF50),
                     start = center,
                     end = Offset(center.x, center.y - radius * 0.7f),
                     strokeWidth = 4f
                 )
             }
 
-            // Gambar jarum detik
             rotate(secondRotation.value, pivot = center) {
                 drawLine(
-                    color = Color(0xFF4CAF50), // Hijau
+                    color = Color(0xFF4CAF50),
                     start = center,
                     end = Offset(center.x, center.y - radius * 0.9f),
                     strokeWidth = 2f
                 )
             }
 
-            // Gambar titik tengah
             drawCircle(
-                color = Color(0xFF4CAF50), // Hijau
+                color = Color(0xFF4CAF50),
                 radius = 10f,
                 center = center
             )
