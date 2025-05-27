@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import com.example.liveinpeace.R
 import com.example.liveinpeace.ui.checklist.ChecklistIbadahActivity
-import com.example.liveinpeace.ui.home.HomeActivity
 import com.example.liveinpeace.ui.note.NoteActivity
 import com.example.liveinpeace.ui.profile.ProfileActivity
 import com.example.liveinpeace.ui.reminder.ReminderActivity
@@ -31,7 +30,7 @@ class FeaturesListActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val cardDASSQuestionnaire = findViewById<CardView>(R.id.cardDASSQuestionnaire) // ID baru
+        val cardDASSQuestionnaire = findViewById<CardView>(R.id.cardDASSQuestionnaire)
         cardDASSQuestionnaire.setOnClickListener {
             val intent = Intent(this, DASSQuestionnaireActivity::class.java)
             startActivity(intent)
@@ -40,15 +39,8 @@ class FeaturesListActivity : AppCompatActivity() {
         // Bottom Navigation
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.selectedItemId = R.id.nav_features
-
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, HomeActivity::class.java))
-                    overridePendingTransition(0, 0)
-                    finish()
-                    true
-                }
                 R.id.nav_notes -> {
                     startActivity(Intent(this, NoteActivity::class.java))
                     overridePendingTransition(0, 0)

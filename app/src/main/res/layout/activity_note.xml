@@ -75,10 +75,8 @@
             android:padding="4dp"
             app:chipBackgroundColor="@android:color/white"
             app:chipStrokeColor="#2E7D32"
-            app:singleSelection="true">
+            app:singleSelection="true" />
 
-            <!-- Chips will be added programmatically -->
-        </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
 
     <!-- Notes List -->

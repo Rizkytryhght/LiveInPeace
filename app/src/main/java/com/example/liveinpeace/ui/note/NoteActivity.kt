@@ -14,11 +14,10 @@ import com.example.liveinpeace.R
 import com.example.liveinpeace.data.Note
 import com.example.liveinpeace.data.repository.NoteRepository
 import com.example.liveinpeace.ui.features.FeaturesListActivity
-import com.example.liveinpeace.ui.home.HomeActivity
-import com.example.liveinpeace.ui.profile.ProfileActivity // 🔥 Import ini
+import com.example.liveinpeace.ui.profile.ProfileActivity
 import com.example.liveinpeace.viewModel.NoteViewModel
 import com.example.liveinpeace.viewModel.NoteViewModelFactory
-import com.google.android.material.bottomnavigation.BottomNavigationView // 🔥
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -45,8 +44,8 @@ class NoteActivity : AppCompatActivity() {
 
         noteViewModel = ViewModelProvider(this, viewModelFactory)[NoteViewModel::class.java]
 
-        // Di dalam NoteActivity, bagian adapter diubah jadi:
-        adapter = NoteAdapter(mutableListOf(),
+        adapter = NoteAdapter(
+            mutableListOf(),
             { note ->
                 val intent = Intent(this@NoteActivity, NoteDetailActivity::class.java)
                 intent.putExtra("note_id", note.id)
@@ -81,19 +80,12 @@ class NoteActivity : AppCompatActivity() {
 
         setupChips()
 
-        // 🔥 Bottom navigation setup
+        // Bottom navigation setup
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.selectedItemId = R.id.nav_notes
-
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, HomeActivity::class.java))
-                    overridePendingTransition(0, 0)
-                    finish()
-                    true
-                }
-                R.id.nav_notes -> true // udah di sini
+                R.id.nav_notes -> true
                 R.id.nav_features -> {
                     startActivity(Intent(this, FeaturesListActivity::class.java))
                     overridePendingTransition(0, 0)
@@ -114,7 +106,7 @@ class NoteActivity : AppCompatActivity() {
     private fun observeRealtimeNotes() {
         noteViewModel.realtimeNotes.observe(this) { notes ->
             allNotes = notes
-            val sortedNotes = notes.sortedByDescending { it.date + it.time } // urutkan berdasarkan waktu
+            val sortedNotes = notes.sortedByDescending { it.date + it.time }
             adapter.updateList(sortedNotes)
         }
     }
@@ -161,7 +153,7 @@ class NoteActivity : AppCompatActivity() {
         }
     }
 
-    @Deprecated("This method has been deprecated in favor of using the Activity Result API\n      which brings increased type safety via an {@link ActivityResultContract} and the prebuilt\n      contracts for common intents available in\n      {@link androidx.activity.result.contract.ActivityResultContracts}, provides hooks for\n      testing, and allow receiving results in separate, testable classes independent from your\n      activity. Use\n      {@link #registerForActivityResult(ActivityResultContract, ActivityResultCallback)}\n      with the appropriate {@link ActivityResultContract} and handling the result in the\n      {@link ActivityResultCallback#onActivityResult(Object) callback}.")
+    @Deprecated("This method has been deprecated in favor of using the Activity Result API...")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && data != null) {

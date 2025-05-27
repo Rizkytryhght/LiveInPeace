@@ -1,5 +1,6 @@
 package com.example.liveinpeace.ui.profile
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -14,7 +15,6 @@ import com.example.liveinpeace.data.repository.ProfileRepository
 import com.example.liveinpeace.databinding.ActivityProfileBinding
 import com.example.liveinpeace.ui.auth.AuthActivity
 import com.example.liveinpeace.ui.features.FeaturesListActivity
-import com.example.liveinpeace.ui.home.HomeActivity
 import com.example.liveinpeace.ui.note.NoteActivity
 import com.example.liveinpeace.viewModel.ProfileViewModel
 import com.example.liveinpeace.viewModel.ProfileViewModelFactory
@@ -57,12 +57,6 @@ class ProfileActivity : AppCompatActivity() {
         bottomNavigationView.selectedItemId = R.id.nav_profile
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, HomeActivity::class.java))
-                    overridePendingTransition(0, 0)
-                    finish()
-                    true
-                }
                 R.id.nav_notes -> {
                     startActivity(Intent(this, NoteActivity::class.java))
                     overridePendingTransition(0, 0)
@@ -97,9 +91,10 @@ class ProfileActivity : AppCompatActivity() {
         finish()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun updateProfileUI(profile: ProfileModel) {
         binding.profileName.text = "${profile.firstName} ${profile.lastName}"
-        binding.profileUsername.text = "${profile.email}"
+        binding.profileUsername.text = profile.email
         if (profile.profileImagePath.isNotBlank()) {
             try {
                 binding.profileImage.setImageURI(Uri.fromFile(File(profile.profileImagePath)))
