@@ -18,32 +18,21 @@ class FeaturesListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_feature_list)
 
-        // Card Checklist Ibadah
-        val cardChecklistIbadah = findViewById<CardView>(R.id.cardChecklistIbadah)
-        cardChecklistIbadah.setOnClickListener {
-            val intent = Intent(this, ChecklistIbadahActivity::class.java)
-            startActivity(intent)
+        // Setup kartu
+        findViewById<CardView>(R.id.cardChecklistIbadah).setOnClickListener {
+            startActivity(Intent(this, ChecklistIbadahActivity::class.java))
+        }
+        findViewById<CardView>(R.id.reminderCard).setOnClickListener {
+            startActivity(Intent(this, ReminderActivity::class.java))
+        }
+        findViewById<CardView>(R.id.cardDASSQuestionnaire).setOnClickListener {
+            startActivity(Intent(this, DASSQuestionnaireActivity::class.java))
+        }
+        findViewById<CardView>(R.id.cardMoodTracker).setOnClickListener {
+            startActivity(Intent(this, MoodTrackerActivity::class.java))
         }
 
-        val reminderCard = findViewById<CardView>(R.id.reminderCard)
-        reminderCard.setOnClickListener {
-            val intent = Intent(this, ReminderActivity::class.java)
-            startActivity(intent)
-        }
-
-        val cardDASSQuestionnaire = findViewById<CardView>(R.id.cardDASSQuestionnaire)
-        cardDASSQuestionnaire.setOnClickListener {
-            val intent = Intent(this, DASSQuestionnaireActivity::class.java)
-            startActivity(intent)
-        }
-
-        val cardMoodTracker = findViewById<CardView>(R.id.cardMoodTracker)
-        cardMoodTracker.setOnClickListener {
-            val intent = Intent(this, MoodTrackerActivity::class.java)
-            startActivity(intent)
-        }
-
-        // Bottom Navigation
+        // Setup bottom navbar
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.selectedItemId = R.id.nav_features
         bottomNavigationView.setOnItemSelectedListener { item ->
