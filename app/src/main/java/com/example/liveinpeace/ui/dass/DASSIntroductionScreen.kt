@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun DASSIntroductionScreen(navController: NavController) {
-    var currentPage by remember { mutableStateOf(1) }
+    var currentPage by remember { mutableIntStateOf(1) }
     val totalPages = 3
     val greenColor = Color(0xFF4CAF50)
     val backgroundColor = Color(0xFFF5F7FA)
