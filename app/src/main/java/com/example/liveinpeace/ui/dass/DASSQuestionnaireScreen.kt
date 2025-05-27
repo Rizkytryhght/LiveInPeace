@@ -152,7 +152,7 @@ fun DASSQuestionnaireScreen(navController: NavController) {
                 TextButton(
                     onClick = { showDialog = false }
                 ) {
-                    Text("Tidak", color = Color.Gray, fontSize = 16.sp)
+                    Text("Tidak", color = Color.Red, fontSize = 16.sp)
                 }
             },
             containerColor = Color.White,
@@ -182,7 +182,7 @@ fun DASSQuestionnaireScreen(navController: NavController) {
                 TextButton(
                     onClick = { showBackDialog = false }
                 ) {
-                    Text("Tidak", color = Color.Gray, fontSize = 16.sp)
+                    Text("Tidak", color = Color.Red, fontSize = 16.sp)
                 }
             },
             containerColor = Color.White,

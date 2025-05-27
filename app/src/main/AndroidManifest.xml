@@ -47,6 +47,7 @@
         <activity android:name=".ui.checklist.ChecklistActivity"/>
         <activity android:name=".ui.reminder.ReminderActivity"/>
         <activity android:name=".ui.dass.DASSQuestionnaireActivity"/>
+        <activity android:name=".ui.mood.MoodTrackerActivity" />
 
         <!-- Reminder Receiver -->
         <receiver android:name=".ui.receiver.ReminderReceiver" android:exported="false" />

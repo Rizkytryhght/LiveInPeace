@@ -10,6 +10,7 @@ import com.example.liveinpeace.ui.note.NoteActivity
 import com.example.liveinpeace.ui.profile.ProfileActivity
 import com.example.liveinpeace.ui.reminder.ReminderActivity
 import com.example.liveinpeace.ui.dass.DASSQuestionnaireActivity
+import com.example.liveinpeace.ui.mood.MoodTrackerActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class FeaturesListActivity : AppCompatActivity() {
@@ -33,6 +34,12 @@ class FeaturesListActivity : AppCompatActivity() {
         val cardDASSQuestionnaire = findViewById<CardView>(R.id.cardDASSQuestionnaire)
         cardDASSQuestionnaire.setOnClickListener {
             val intent = Intent(this, DASSQuestionnaireActivity::class.java)
+            startActivity(intent)
+        }
+
+        val cardMoodTracker = findViewById<CardView>(R.id.cardMoodTracker)
+        cardMoodTracker.setOnClickListener {
+            val intent = Intent(this, MoodTrackerActivity::class.java)
             startActivity(intent)
         }
 
