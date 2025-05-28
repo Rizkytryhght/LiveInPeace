@@ -8,12 +8,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.liveinpeace.data.repository.DASSRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
+import kotlinx.coroutines.launch
 
 @Composable
 fun DASSIntroductionScreen(navController: NavController) {
@@ -21,8 +25,27 @@ fun DASSIntroductionScreen(navController: NavController) {
     val totalPages = 3
     val greenColor = Color(0xFF4CAF50)
     val backgroundColor = Color(0xFFF5F7FA)
+    var showDialog by remember { mutableStateOf(false) }
+    var canTakeQuiz by remember { mutableStateOf(true) }
+    var isLoading by remember { mutableStateOf(true) }
 
     val context = LocalContext.current
+    val repository = DASSRepository(
+        com.example.liveinpeace.data.local.room.AppDatabase.getDatabase(context).dassScoreDao(),
+        FirebaseFirestore.getInstance()
+    )
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "anonymous"
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch {
+            val lastTime = repository.getLastScoreTimestamp(userId)
+            val now = System.currentTimeMillis()
+            val oneWeekMillis = 7L * 24 * 60 * 60 * 1000
+            canTakeQuiz = lastTime == null || (now - lastTime) >= oneWeekMillis
+            isLoading = false
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -171,15 +194,25 @@ fun DASSIntroductionScreen(navController: NavController) {
                     if (currentPage < totalPages) {
                         currentPage++
                     } else {
-                        navController.navigate("dass_questionnaire")
+                        if (isLoading) {
+                            // Tunggu cek selesai
+                        } else if (canTakeQuiz) {
+                            navController.navigate("dass_questionnaire")
+                        } else {
+                            showDialog = true
+                        }
                     }
                 },
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = greenColor),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = greenColor,
+                    disabledContainerColor = Color.Gray
+                ),
                 shape = RoundedCornerShape(12.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
+                enabled = !isLoading
             ) {
                 Text(
                     text = if (currentPage < totalPages) "Next" else "Mulai Tes",
@@ -188,5 +221,37 @@ fun DASSIntroductionScreen(navController: NavController) {
                 )
             }
         }
+    }
+
+    // Dialog kalau belum 7 hari
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = {
+                Text(
+                    "Batas Kuesioner",
+                    fontSize = 18.sp,
+                    color = Color(0xFF2196F3)
+                )
+            },
+            text = {
+                Text(
+                    "Kuesioner hanya boleh diisi sekali seminggu. Kembali ke menu DASS!",
+                    fontSize = 16.sp
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDialog = false
+                    navController.navigate("dass_options") {
+                        popUpTo("dass_introduction") { inclusive = true }
+                    }
+                }) {
+                    Text("OK", color = Color(0xFF4CAF50))
+                }
+            },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(12.dp)
+        )
     }
 }
