@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.*
@@ -23,7 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.liveinpeace.ui.features.FeaturesListActivity
+import com.example.liveinpeace.data.repository.DASSRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
 @Composable
 fun DASSOptionsScreen(navController: NavController) {
@@ -33,12 +36,32 @@ fun DASSOptionsScreen(navController: NavController) {
         endY = 600f
     )
     var isCardAnimated by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(targetValue = if (isCardAnimated) 1f else 0.9f, animationSpec = tween(500))
+    val scale by animateFloatAsState(
+        targetValue = if (isCardAnimated) 1f else 0.9f,
+        animationSpec = tween(500)
+    )
+    var showDialog by remember { mutableStateOf(false) }
+    var canTakeQuiz by remember { mutableStateOf(true) }
+    var isLoading by remember { mutableStateOf(true) }
 
     val context = LocalContext.current
+    val repository = DASSRepository(
+        com.example.liveinpeace.data.local.room.AppDatabase.getDatabase(context).dassScoreDao(),
+        FirebaseFirestore.getInstance()
+    )
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "anonymous"
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         isCardAnimated = true
+        coroutineScope.launch {
+            val lastTime = repository.getLastScoreTimestamp(userId)
+            val now = System.currentTimeMillis()
+            val oneWeekMillis = 7L * 24 * 60 * 60 * 1000
+            canTakeQuiz = lastTime == null || (now - lastTime) >= oneWeekMillis
+            isLoading = false
+        }
+        repository.clearAllScores()
     }
 
     Box(
@@ -47,10 +70,9 @@ fun DASSOptionsScreen(navController: NavController) {
             .background(gradient)
             .padding(16.dp)
     ) {
-        // Tombol Back di pojok kiri atas
         IconButton(
             onClick = {
-                (context as? androidx.activity.ComponentActivity)?.finish()
+                navController.navigate("main") // Kembali ke MainActivity
             },
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -59,7 +81,7 @@ fun DASSOptionsScreen(navController: NavController) {
                 .background(Color.White.copy(alpha = 0.9f))
         ) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Kembali",
                 tint = Color(0xFF4CAF50),
                 modifier = Modifier.size(24.dp)
@@ -67,8 +89,7 @@ fun DASSOptionsScreen(navController: NavController) {
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -80,70 +101,116 @@ fun DASSOptionsScreen(navController: NavController) {
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-                    .scale(scale)
-                    .clip(RoundedCornerShape(16.dp)),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                onClick = { navController.navigate("dass_introduction") }
-            ) {
-                Row(
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White)
+            } else {
+                // Card Isi Kuesioner
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
+                        .padding(bottom = 16.dp)
+                        .scale(scale)
+                        .clip(RoundedCornerShape(16.dp)),
+                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                    onClick = {
+                        if (canTakeQuiz) {
+                            navController.navigate("dass_introduction")
+                        } else {
+                            showDialog = true
+                        }
+                    }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = "Isi Kuesioner",
-                        tint = Color(0xFF4CAF50),
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = "Isi Kuesioner",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF212121)
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = "Isi Kuesioner",
+                            tint = Color(0xFF4CAF50),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = "Isi Kuesioner",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF212121)
+                        )
+                    }
                 }
-            }
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .scale(scale)
-                    .clip(RoundedCornerShape(16.dp)),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                onClick = { navController.navigate("dass_history") }
-            ) {
-                Row(
+                // Card History
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
+                        .scale(scale)
+                        .clip(RoundedCornerShape(16.dp)),
+                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                    onClick = { navController.navigate("dass_history") }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.History,
-                        contentDescription = "Lihat History",
-                        tint = Color(0xFF4CAF50),
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = "Lihat History",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF212121)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.History,
+                            contentDescription = "Lihat History",
+                            tint = Color(0xFF4CAF50),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(
+                            text = "Lihat History",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF212121)
+                        )
+                    }
+                }
+
+                // Dialog kalau belum 7 hari
+                if (showDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDialog = false },
+                        title = {
+                            Text(
+                                "Batas Kuesioner",
+                                fontSize = 18.sp,
+                                color = Color(0xFF2196F3)
+                            )
+                        },
+                        text = {
+                            Text(
+                                "Kuesioner hanya boleh diisi sekali seminggu. Tunggu hingga minggu depan!",
+                                fontSize = 16.sp
+                            )
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { showDialog = false }) {
+                                Text("OK", color = Color(0xFF4CAF50))
+                            }
+                        },
+                        containerColor = Color.White,
+                        shape = RoundedCornerShape(12.dp)
                     )
                 }
             }
         }
+//        Button(onClick = {
+//            coroutineScope.launch {
+//                repository.clearAllScores()
+//            }
+//        }) {
+//            Text("Clear Room Data (Debug)")
+//        }
     }
 }

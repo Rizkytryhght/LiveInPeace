@@ -24,28 +24,3 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 }
-
-
-//class MainActivity : AppCompatActivity() {
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//
-//        val user = FirebaseAuth.getInstance().currentUser
-//        if (!OnboardingPreferences.isCompleted(this)) {
-//            startActivity(Intent(this, OnboardingActivity::class.java))
-//            finish()
-//            return
-//        }
-//
-//        if (user == null) {
-//            // Jika user belum login, pindah ke halaman login
-//            startActivity(Intent(this, AuthActivity::class.java))
-//            finish()
-//        } else {
-//            // Jika user sudah login, tetap di halaman utama
-//            startActivity(Intent(this, NoteActivity::class.java))
-////            startActivity(Intent(this, ProfileActivity::class.java))
-//            finish()
-//        }
-//    }
-//}

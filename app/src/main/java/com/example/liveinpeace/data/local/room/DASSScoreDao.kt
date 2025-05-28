@@ -18,4 +18,7 @@ interface DASSScoreDao {
 
     @Query("SELECT timestamp FROM dass_scores WHERE userId = :userId ORDER BY timestamp DESC LIMIT 1")
     suspend fun getLastScoreTimestamp(userId: String): Long?
+
+    @Query ("DELETE FROM dass_scores")
+    suspend fun deleteAllScores()
 }

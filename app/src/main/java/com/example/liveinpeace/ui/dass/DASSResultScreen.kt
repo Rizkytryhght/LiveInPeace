@@ -1,12 +1,14 @@
 package com.example.liveinpeace.ui.dass
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +34,8 @@ fun DASSResultScreen(navController: NavController, answersString: String) {
         FirebaseFirestore.getInstance()
     )
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "anonymous"
+    var showDialog by remember { mutableStateOf(false) }
+    var dialogMessage by remember { mutableStateOf("") }
 
     val decodedAnswers = try {
         URLDecoder.decode(answersString, StandardCharsets.UTF_8.toString())
@@ -99,6 +103,7 @@ fun DASSResultScreen(navController: NavController, answersString: String) {
 
     LaunchedEffect(answers) {
         if (answers.isNotEmpty()) {
+            val isOnline = isNetworkAvailable(context)
             val score = DASSScore(
                 userId = userId,
                 depressionScore = depressionScore,
@@ -107,9 +112,14 @@ fun DASSResultScreen(navController: NavController, answersString: String) {
                 timestamp = System.currentTimeMillis()
             )
             withContext(Dispatchers.IO) {
-                repository.insertScore(score)
+                val saved = repository.insertScore(score, isOnline)
+                if (!saved) {
+                    dialogMessage = "Gagal menyimpan hasil karena tidak ada koneksi internet."
+                    showDialog = true
+                } else {
+                    Log.d("DASSResultScreen", "Saved score: $score")
+                }
             }
-            Log.d("DASSResultScreen", "Saved score: $score")
         }
     }
 
@@ -167,6 +177,32 @@ fun DASSResultScreen(navController: NavController, answersString: String) {
             Text("Kembali", color = Color.White, fontSize = 16.sp)
         }
     }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = {
+                Text(
+                    "Gagal Menyimpan",
+                    fontSize = 18.sp,
+                    color = Color(0xFFF44336)
+                )
+            },
+            text = {
+                Text(
+                    dialogMessage,
+                    fontSize = 16.sp
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("OK", color = Color(0xFF4CAF50))
+                }
+            },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(12.dp)
+        )
+    }
 }
 
 @Composable
@@ -213,4 +249,16 @@ fun ErrorScreen(navController: NavController) {
             }
         }
     }
+}
+
+/**
+ * Cek apakah ada koneksi internet
+ */
+fun isNetworkAvailable(context: Context): Boolean {
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val network = connectivityManager.activeNetwork ?: return false
+    val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+    return capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
 }

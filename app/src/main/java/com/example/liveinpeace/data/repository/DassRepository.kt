@@ -3,8 +3,10 @@ package com.example.liveinpeace.data.repository
 import com.example.liveinpeace.data.local.room.DASSScore
 import com.example.liveinpeace.data.local.room.DASSScoreDao
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 class DASSRepository(
@@ -13,23 +15,30 @@ class DASSRepository(
 ) {
 
     /**
-     * Menyimpan skor DASS ke Room dan Firestore
+     * Menyimpan skor DASS ke Firestore kalau ada koneksi internet
+     * Tidak menyimpan ke Room atau Firestore kalau offline
+     * Mengembalikan true kalau sukses, false kalau gagal (misal, offline)
      */
-    suspend fun insertScore(score: DASSScore) {
-        // Simpan ke Room Database lokal
-        dao.insertScore(score)
+    suspend fun insertScore(score: DASSScore, isOnline: Boolean): Boolean {
+        return withContext(Dispatchers.IO) {
+            if (!isOnline) {
+                println("No internet connection, skipping save")
+                return@withContext false
+            }
 
-        // Simpan ke Firebase Firestore (cloud)
-        try {
-            firestore.collection("users")
-                .document(score.userId)
-                .collection("dass_scores")
-                .document(score.timestamp.toString())
-                .set(score)
-                .await()
-            println("Successfully saved to Firestore: ${score.timestamp}")
-        } catch (e: Exception) {
-            println("Error saving to Firestore: ${e.message}")
+            try {
+                firestore.collection("users")
+                    .document(score.userId)
+                    .collection("dass_scores")
+                    .document(score.timestamp.toString())
+                    .set(score)
+                    .await()
+                println("Successfully saved to Firestore: ${score.timestamp}")
+                true
+            } catch (e: Exception) {
+                println("Error saving to Firestore: ${e.message}")
+                false
+            }
         }
     }
 
@@ -62,9 +71,42 @@ class DASSRepository(
     }
 
     /**
-     * Mengambil timestamp terakhir user mengisi DASS
+     * Mengambil timestamp terakhir user mengisi DASS dari Room dan Firestore
+     * Mengembalikan timestamp terbaru atau null kalau belum ada data
      */
     suspend fun getLastScoreTimestamp(userId: String): Long? {
-        return dao.getLastScoreTimestamp(userId)
+        return withContext(Dispatchers.IO) {
+            // Cek Room
+            val roomTimestamp = dao.getLastScoreTimestamp(userId)
+
+            // Cek Firestore
+            val firestoreTimestamp = try {
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("dass_scores")
+                    .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                    .limit(1)
+                    .get()
+                    .await()
+                    .documents
+                    .firstOrNull()
+                    ?.getLong("timestamp")
+            } catch (e: Exception) {
+                println("Error fetching Firestore timestamp: ${e.message}")
+                null
+            }
+
+            // Ambil timestamp terbaru dari Room atau Firestore
+            listOfNotNull(roomTimestamp, firestoreTimestamp).maxOrNull()
+        }
+    }
+
+    /**
+     * Menghapus semua skor DASS dari Room
+     */
+    suspend fun clearAllScores() {
+        withContext(Dispatchers.IO) {
+            dao.deleteAllScores()
+        }
     }
 }
