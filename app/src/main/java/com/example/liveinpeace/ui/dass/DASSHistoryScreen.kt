@@ -233,9 +233,14 @@ fun BarChartView(scores: List<DASSScore>) {
                     valueTextSize = 10f
                 }
 
-                data = BarData(dataSetDepression, dataSetAnxiety, dataSetStress).apply {
+                val barData = BarData(dataSetDepression, dataSetAnxiety, dataSetStress).apply {
                     barWidth = 0.3f // Lebar tiap batang
                 }
+
+                // Atur jarak antar grup batang, grup pertama lebih dekat ke 0
+                barData.groupBars(-0.3f, 0.1f, 0.02f) // start, groupSpace, barSpace
+
+                data = barData
 
                 xAxis.apply {
                     position = XAxis.XAxisPosition.BOTTOM
@@ -243,13 +248,17 @@ fun BarChartView(scores: List<DASSScore>) {
                         override fun getFormattedValue(value: Float): String {
                             val index = value.toInt()
                             return if (index in scores.indices) {
-                                formatTimestamp(scores.reversed()[index].timestamp)
+                                formatTimestampShort(scores.reversed()[index].timestamp)
                             } else ""
                         }
                     }
                     textColor = Color(0xFF333333).toArgb()
+                    textSize = 10f // Kecilkan ukuran teks
+//                    labelRotationAngle = 45f // Putar label 45 derajat
                     granularity = 1f
                     setDrawGridLines(false)
+                    axisMinimum = -0.5f // Sesuaikan dengan start groupBars
+                    setCenterAxisLabels(true) // Pusatkan label di bawah grup batang
                 }
 
                 axisLeft.apply {
@@ -262,6 +271,7 @@ fun BarChartView(scores: List<DASSScore>) {
                 description.isEnabled = false
                 legend.textColor = Color(0xFF333333).toArgb()
                 setFitBars(true)
+                extraBottomOffset = 10f // Tambah padding bawah biar label nggak kepotong
                 invalidate() // Refresh chart
             }
         },
@@ -328,6 +338,15 @@ fun ScoreItem(label: String, score: Int) {
 private fun formatTimestamp(timestamp: Long): String {
     return try {
         val sdf = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale("id", "ID"))
+        sdf.format(Date(timestamp))
+    } catch (e: Exception) {
+        "Tanggal tidak valid"
+    }
+}
+
+private fun formatTimestampShort(timestamp: Long): String {
+    return try {
+        val sdf = SimpleDateFormat("dd MMM", Locale("id", "ID"))
         sdf.format(Date(timestamp))
     } catch (e: Exception) {
         "Tanggal tidak valid"
