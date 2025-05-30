@@ -14,7 +14,7 @@
         android:text="Ruang Tenang"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="#2E7D32"
+        android:textColor="#324F5E"
         android:fontFamily="sans-serif-condensed"
         android:layout_marginTop="16dp"
         app:layout_constraintTop_toTopOf="parent"
