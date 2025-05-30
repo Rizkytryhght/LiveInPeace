@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="ui.note.NoteDetailActivity"
-    android:background="#EFF0F6">
+    android:background="#E6F0FA">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

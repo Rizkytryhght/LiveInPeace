@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    android:background="#F5F7FA"
+    android:background="#E6F0FA"
     android:padding="20dp">
 
     <!-- Back Navigation -->
