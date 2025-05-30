@@ -36,6 +36,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DASSHistoryScreen(navController: NavController) {
     val context = LocalContext.current
@@ -49,11 +50,25 @@ fun DASSHistoryScreen(navController: NavController) {
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(Unit) {
+    // State untuk filter bulan
+    val calendar = Calendar.getInstance()
+    var selectedYear by remember { mutableStateOf(calendar.get(Calendar.YEAR)) }
+    var selectedMonth by remember { mutableStateOf(calendar.get(Calendar.MONTH)) }
+    var expanded by remember { mutableStateOf(false) }
+
+    // List opsi bulan (12 bulan terakhir)
+    val monthOptions = (0..11).map { month ->
+        calendar.apply {
+            set(Calendar.MONTH, month)
+        }
+        "${getMonthName(month)} ${calendar.get(Calendar.YEAR)}" to Pair(calendar.get(Calendar.YEAR), month)
+    }.reversed()
+
+    LaunchedEffect(selectedYear, selectedMonth) {
         coroutineScope.launch {
             try {
-                println("Loading scores for userId: $userId")
-                scores = repository.getAllScores(userId)
+                println("Loading scores for userId: $userId, $selectedYear-$selectedMonth")
+                scores = repository.getScoresByMonth(userId, selectedYear, selectedMonth)
                 println("Scores loaded: ${scores.size}")
             } catch (e: Exception) {
                 errorMessage = "Gagal memuat riwayat: ${e.message}"
@@ -101,8 +116,49 @@ fun DASSHistoryScreen(navController: NavController) {
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF2196F3),
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 8.dp)
             )
+
+            // Dropdown filter bulan
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                TextField(
+                    value = "${getMonthName(selectedMonth)} $selectedYear",
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Pilih Bulan") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth(),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        focusedIndicatorColor = Color(0xFF4CAF50),
+                        unfocusedIndicatorColor = Color(0xFF4CAF50)
+                    )
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    monthOptions.forEach { (label, yearMonth) ->
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                selectedYear = yearMonth.first
+                                selectedMonth = yearMonth.second
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
 
             when {
                 isLoading -> {
@@ -119,7 +175,7 @@ fun DASSHistoryScreen(navController: NavController) {
                 }
                 scores.isEmpty() -> {
                     Text(
-                        text = "Belum ada riwayat kuesioner",
+                        text = "Belum ada riwayat kuesioner untuk ${getMonthName(selectedMonth)} $selectedYear",
                         fontSize = 18.sp,
                         color = Color(0xFF333333),
                         textAlign = TextAlign.Center,
@@ -275,5 +331,23 @@ private fun formatTimestamp(timestamp: Long): String {
         sdf.format(Date(timestamp))
     } catch (e: Exception) {
         "Tanggal tidak valid"
+    }
+}
+
+private fun getMonthName(month: Int): String {
+    return when (month) {
+        0 -> "Januari"
+        1 -> "Februari"
+        2 -> "Maret"
+        3 -> "April"
+        4 -> "Mei"
+        5 -> "Juni"
+        6 -> "Juli"
+        7 -> "Agustus"
+        8 -> "September"
+        9 -> "Oktober"
+        10 -> "November"
+        11 -> "Desember"
+        else -> ""
     }
 }

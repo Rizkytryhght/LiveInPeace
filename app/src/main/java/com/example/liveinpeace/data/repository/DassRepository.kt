@@ -149,16 +149,57 @@ class DASSRepository(
                 scores.forEach { println("Firestore score: $it") }
                 scores
             } catch (e: Exception) {
-                println("Error fetching Firestore scores: ${e.message}")
+                println("Error loading Firestore scores: ${e.message}")
                 emptyList()
             }
 
-            // Gabungkan, hapus duplikat berdasarkan timestamp, urut terbaru
-            val combinedScores = (roomScores + firestoreScores)
+            // Gabungkan, hapus duplikat
+            (roomScores + firestoreScores)
                 .distinctBy { it.timestamp }
                 .sortedByDescending { it.timestamp }
-            println("Total combined scores: ${combinedScores.size}")
-            combinedScores
+        }
+    }
+
+    /**
+     * Mengambil skor untuk user tertentu pada bulan dan tahun tertentu dari Firestore
+     * Mengembalikan daftar skor, diurutkan dari terbaru
+     */
+    suspend fun getScoresByMonth(userId: String, year: Int, month: Int): List<DASSScore> {
+        return withContext(Dispatchers.IO) {
+            try {
+                // Hitung start dan end timestamp untuk bulan
+                val calendar = Calendar.getInstance().apply {
+                    set(year, month, 1, 0, 0, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+                val startOfMonth = calendar.timeInMillis
+
+                calendar.add(Calendar.MONTH, 1)
+                val endOfMonth = calendar.timeInMillis
+
+                // Query Firestore
+                val snapshot = firestore.collection("users")
+                    .document(userId)
+                    .collection("dass_scores")
+                    .whereGreaterThanOrEqualTo("timestamp", startOfMonth)
+                    .whereLessThan("timestamp", endOfMonth)
+                    .get()
+                    .await()
+
+                val scores = snapshot.documents.mapNotNull { doc ->
+                    try {
+                        doc.toObject(DASSScore::class.java)?.copy(id = doc.getLong("id")?.toInt() ?: 0)
+                    } catch (e: Exception) {
+                        println("Error parsing Firestore document ${doc.id}: ${e.message}")
+                        null
+                    }
+                }
+                println("Firestore scores for $year-$month: ${scores.size}")
+                scores.sortedByDescending { it.timestamp }
+            } catch (e: Exception) {
+                println("Error fetching Firestore scores for $year-$month: ${e.message}")
+                emptyList()
+            }
         }
     }
 }
