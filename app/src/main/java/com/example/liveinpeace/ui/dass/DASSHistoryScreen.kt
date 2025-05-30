@@ -24,11 +24,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.example.liveinpeace.data.local.room.DASSScore
 import com.example.liveinpeace.data.repository.DASSRepository
-import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -128,7 +128,7 @@ fun DASSHistoryScreen(navController: NavController) {
                 }
                 else -> {
                     // Grafik
-                    LineChartView(scores = scores)
+                    BarChartView(scores = scores)
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Daftar Skor
@@ -147,40 +147,39 @@ fun DASSHistoryScreen(navController: NavController) {
 }
 
 @Composable
-fun LineChartView(scores: List<DASSScore>) {
+fun BarChartView(scores: List<DASSScore>) {
     AndroidView(
         factory = { context ->
-            LineChart(context).apply {
+            BarChart(context).apply {
                 val entriesDepression = scores.reversed().mapIndexed { index, score ->
-                    Entry(index.toFloat(), score.depressionScore.toFloat())
+                    BarEntry(index.toFloat(), score.depressionScore.toFloat())
                 }
                 val entriesAnxiety = scores.reversed().mapIndexed { index, score ->
-                    Entry(index.toFloat(), score.anxietyScore.toFloat())
+                    BarEntry(index.toFloat() + 0.33f, score.anxietyScore.toFloat())
                 }
                 val entriesStress = scores.reversed().mapIndexed { index, score ->
-                    Entry(index.toFloat(), score.stressScore.toFloat())
+                    BarEntry(index.toFloat() + 0.66f, score.stressScore.toFloat())
                 }
 
-                val dataSetDepression = LineDataSet(entriesDepression, "Depresi").apply {
+                val dataSetDepression = BarDataSet(entriesDepression, "Depresi").apply {
                     color = Color(0xFF2196F3).toArgb()
-                    setDrawCircles(true)
-                    setDrawValues(false)
-                    lineWidth = 2f
+                    valueTextColor = Color(0xFF333333).toArgb()
+                    valueTextSize = 10f
                 }
-                val dataSetAnxiety = LineDataSet(entriesAnxiety, "Kecemasan").apply {
+                val dataSetAnxiety = BarDataSet(entriesAnxiety, "Kecemasan").apply {
                     color = Color(0xFF4CAF50).toArgb()
-                    setDrawCircles(true)
-                    setDrawValues(false)
-                    lineWidth = 2f
+                    valueTextColor = Color(0xFF333333).toArgb()
+                    valueTextSize = 10f
                 }
-                val dataSetStress = LineDataSet(entriesStress, "Stres").apply {
+                val dataSetStress = BarDataSet(entriesStress, "Stres").apply {
                     color = Color(0xFFF44336).toArgb()
-                    setDrawCircles(true)
-                    setDrawValues(false)
-                    lineWidth = 2f
+                    valueTextColor = Color(0xFF333333).toArgb()
+                    valueTextSize = 10f
                 }
 
-                data = LineData(dataSetDepression, dataSetAnxiety, dataSetStress)
+                data = BarData(dataSetDepression, dataSetAnxiety, dataSetStress).apply {
+                    barWidth = 0.3f // Lebar tiap batang
+                }
 
                 xAxis.apply {
                     position = XAxis.XAxisPosition.BOTTOM
@@ -194,16 +193,20 @@ fun LineChartView(scores: List<DASSScore>) {
                     }
                     textColor = Color(0xFF333333).toArgb()
                     granularity = 1f
+                    setDrawGridLines(false)
                 }
 
                 axisLeft.apply {
                     textColor = Color(0xFF333333).toArgb()
                     axisMinimum = 0f
+                    setDrawGridLines(true)
                 }
                 axisRight.isEnabled = false
 
                 description.isEnabled = false
                 legend.textColor = Color(0xFF333333).toArgb()
+                setFitBars(true)
+                invalidate() // Refresh chart
             }
         },
         modifier = Modifier
