@@ -9,6 +9,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven(url = "https://jitpack.io")
     }
 }
 dependencyResolutionManagement {
@@ -19,7 +20,6 @@ dependencyResolutionManagement {
         maven(url = "https://jitpack.io")
     }
 }
-
 
 rootProject.name = "LiveInPeace"
 include(":app")

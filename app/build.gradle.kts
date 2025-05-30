@@ -107,6 +107,8 @@ dependencies {
     // MPAndroidChart for Mood Chart
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("androidx.compose.material:material-icons-extended")
+    implementation ("androidx.webkit:webkit:1.8.0")
+//    implementation ("com.github.a914-gowtham:compose-charts:v0.1.1-alpha")
 
     // Jetpack Compose Extensions
     implementation("androidx.compose.material3:material3:1.1.2")
