@@ -14,12 +14,13 @@ import com.example.liveinpeace.viewModel.ReminderViewModel
 fun ReminderItem(
     title: String,
     isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFC8E6C9) // Hijau muda
+            containerColor = Color.White // Card putih
         )
     ) {
         Row(
@@ -32,14 +33,14 @@ fun ReminderItem(
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = Color(0xFF4CAF50) // Hijau
+                color = Color.Black // Teks hitam
             )
             Switch(
                 checked = isChecked,
                 onCheckedChange = onCheckedChange,
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color(0xFF4CAF50), // Hijau
-                    checkedTrackColor = Color(0xFF81C784), // Hijau lebih muda
+                    checkedThumbColor = Color(0xFF2E7D32), // Hijau tua
+                    checkedTrackColor = Color(0xFF4CAF50), // Hijau medium untuk track
                     uncheckedThumbColor = Color.Gray,
                     uncheckedTrackColor = Color.LightGray
                 )
@@ -47,3 +48,42 @@ fun ReminderItem(
         }
     }
 }
+
+//@Composable
+//fun ReminderItem(
+//    title: String,
+//    isChecked: Boolean,
+//    onCheckedChange: (Boolean) -> Unit,
+//    modifier: Modifier = Modifier
+//) {
+//    Card(
+//        modifier = modifier.fillMaxWidth(),
+//        colors = CardDefaults.cardColors(
+//            containerColor = Color.Green // Card putih
+//        )
+//    ) {
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(16.dp),
+//            verticalAlignment = Alignment.CenterVertically,
+//            horizontalArrangement = Arrangement.SpaceBetween
+//        ) {
+//            Text(
+//                text = title,
+//                style = MaterialTheme.typography.titleMedium,
+//                color = Color(0xFF2E7D32) // Hijau tua untuk text
+//            )
+//            Switch(
+//                checked = isChecked,
+//                onCheckedChange = onCheckedChange,
+//                colors = SwitchDefaults.colors(
+//                    checkedThumbColor = Color(0xFF2E7D32), // Hijau tua
+//                    checkedTrackColor = Color(0xFF4CAF50), // Hijau medium untuk track
+//                    uncheckedThumbColor = Color.Gray,
+//                    uncheckedTrackColor = Color.LightGray
+//                )
+//            )
+//        }
+//    }
+//}

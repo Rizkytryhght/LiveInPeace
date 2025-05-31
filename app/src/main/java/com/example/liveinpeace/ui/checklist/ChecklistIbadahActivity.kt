@@ -361,8 +361,8 @@ class ChecklistIbadahActivity : AppCompatActivity() {
             "hafalan" to checkHafalan.isChecked,
 
             // Text fields
-            "quran_from" to editTextQuranFrom.text.toString(),
             "quran_to" to editTextQuranTo.text.toString(),
+            "quran_from" to editTextQuranFrom.text.toString(),
             "harapan" to editTextHarapan.text.toString(),
             "syukur" to editTextSyukur.text.toString()
         )

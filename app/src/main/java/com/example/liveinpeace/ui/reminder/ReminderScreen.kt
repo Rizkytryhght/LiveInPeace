@@ -83,7 +83,7 @@ fun ReminderScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White) // Background putih untuk konsistensi
+            .background(Color(0xFF2E7D32)) // Background putih untuk konsistensi
             .padding(16.dp)
     ) {
         // Tombol Back
@@ -174,7 +174,7 @@ fun ReminderScreen() {
                 Text(
                     text = "Waktu Sholat",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF4CAF50),
+                    color = Color.White,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
@@ -238,7 +238,7 @@ fun ReminderScreen() {
                 Text(
                     text = "Waktu Dzikir",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF4CAF50),
+                    color = Color.White,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
             }
@@ -273,8 +273,8 @@ fun ReminderScreen() {
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50),
-                        contentColor = Color.White
+                        containerColor = Color.White,
+                        contentColor = Color(0xFF2E7D32)
                     )
                 ) {
                     Text("Refresh Jadwal")
