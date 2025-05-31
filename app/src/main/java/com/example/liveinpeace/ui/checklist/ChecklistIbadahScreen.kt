@@ -1,11 +1,14 @@
 package com.example.liveinpeace.ui.checklist
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
@@ -14,10 +17,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
@@ -34,9 +39,11 @@ import androidx.compose.ui.unit.sp
 import com.example.liveinpeace.ui.features.FeaturesListActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.compose.runtime.Composable
+import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.input.pointer.pointerInput
 
 data class PrayerState(
     var tepat: Boolean = false,
@@ -64,49 +71,74 @@ data class TextInputState(
     var syukur: String = ""
 )
 
+sealed class ChecklistState {
+    data object Loading : ChecklistState()
+    data class Success(
+        val prayerState: Map<String, PrayerState>,
+        val sunnahState: SunnahState,
+        val textInputState: TextInputState
+    ) : ChecklistState()
+    data class Error(val message: String) : ChecklistState()
+}
+
+@SuppressLint("UseOfNonLambdaOffsetOverload")
 @Composable
-fun ChecklistIbadahScreen() {
+fun ChecklistIbadahScreen(
+    firestore: FirebaseFirestore,
+    auth: FirebaseAuth,
+    todayDate: String
+) {
     val context = LocalContext.current
     val density = LocalDensity.current
-    val firestore = FirebaseFirestore.getInstance()
-    val auth = FirebaseAuth.getInstance()
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     val displayFormat = SimpleDateFormat("EEEE, dd MMMM yyyy", Locale("id", "ID"))
-    var selectedDate by remember { mutableStateOf(dateFormat.format(Date())) }
-    var isLoaded by remember { mutableStateOf(false) }
-    var prayerState by remember {
-        mutableStateOf(
-            mapOf(
-                "Subuh" to PrayerState(),
-                "Dzuhur" to PrayerState(),
-                "Ashar" to PrayerState(),
-                "Maghrib" to PrayerState(),
-                "Isya" to PrayerState()
-            )
-        )
-    }
-    var sunnahState by remember { mutableStateOf(SunnahState()) }
-    var textInputState by remember { mutableStateOf(TextInputState()) }
+    var selectedDate by remember { mutableStateOf(todayDate) }
+    var checklistState by remember { mutableStateOf<ChecklistState>(ChecklistState.Loading) }
     var panelOffsetY by remember { mutableStateOf(480.dp) }
     val maxOffsetY = 480.dp
     val minOffsetY = 0.dp
 
     LaunchedEffect(selectedDate) {
-        isLoaded = false
-        val uid = auth.currentUser?.uid ?: return@LaunchedEffect
-        val docRef = firestore.collection("users").document(uid)
-            .collection("checklists").document(selectedDate)
-
-        docRef.get().addOnSuccessListener { doc ->
+        checklistState = ChecklistState.Loading
+        val uid = auth.currentUser?.uid ?: run {
+            checklistState = ChecklistState.Error("User tidak terautentikasi")
+            Log.e("ChecklistIbadahScreen", "User tidak terautentikasi")
+            return@LaunchedEffect
+        }
+        try {
+            Log.d("ChecklistIbadahScreen", "Memuat data untuk tanggal: $selectedDate")
+            val docRef = firestore.collection("users").document(uid)
+                .collection("checklists").document(selectedDate)
+            val doc = docRef.get().await()
             if (doc.exists()) {
-                prayerState = prayerState.mapValues { (prayer, state) ->
-                    state.copy(
-                        tepat = doc.getBoolean("${prayer.lowercase()}_tepat") ?: false,
-                        qadha = doc.getBoolean("${prayer.lowercase()}_qadha") ?: false,
-                        badiyah = doc.getBoolean("${prayer.lowercase()}_badiyah") ?: false
+                val prayerState = mapOf(
+                    "Subuh" to PrayerState(
+                        tepat = doc.getBoolean("subuh_tepat") ?: false,
+                        qadha = doc.getBoolean("subuh_qadha") ?: false,
+                        badiyah = doc.getBoolean("subuh_badiyah") ?: false
+                    ),
+                    "Dzuhur" to PrayerState(
+                        tepat = doc.getBoolean("dzuhur_tepat") ?: false,
+                        qadha = doc.getBoolean("dzuhur_qadha") ?: false,
+                        badiyah = doc.getBoolean("dzuhur_badiyah") ?: false
+                    ),
+                    "Ashar" to PrayerState(
+                        tepat = doc.getBoolean("ashar_tepat") ?: false,
+                        qadha = doc.getBoolean("ashar_qadha") ?: false,
+                        badiyah = doc.getBoolean("ashar_badiyah") ?: false
+                    ),
+                    "Maghrib" to PrayerState(
+                        tepat = doc.getBoolean("maghrib_tepat") ?: false,
+                        qadha = doc.getBoolean("maghrib_qadha") ?: false,
+                        badiyah = doc.getBoolean("maghrib_badiyah") ?: false
+                    ),
+                    "Isya" to PrayerState(
+                        tepat = doc.getBoolean("isya_tepat") ?: false,
+                        qadha = doc.getBoolean("isya_qadha") ?: false,
+                        badiyah = doc.getBoolean("isya_badiyah") ?: false
                     )
-                }
-                sunnahState = SunnahState(
+                )
+                val sunnahState = SunnahState(
                     dhuha = doc.getBoolean("dhuha") ?: false,
                     tahajud = doc.getBoolean("tahajud") ?: false,
                     rawatib = doc.getBoolean("rawatib") ?: false,
@@ -118,29 +150,44 @@ fun ChecklistIbadahScreen() {
                     muhasabah = doc.getBoolean("muhasabah") ?: false,
                     hafalan = doc.getBoolean("hafalan") ?: false
                 )
-                textInputState = TextInputState(
+                val textInputState = TextInputState(
                     quranFrom = doc.getString("quran_from") ?: "",
                     quranTo = doc.getString("quran_to") ?: "",
                     harapan = doc.getString("harapan") ?: "",
                     syukur = doc.getString("syukur") ?: ""
                 )
+                checklistState = ChecklistState.Success(prayerState, sunnahState, textInputState)
+                Log.d("ChecklistIbadahScreen", "Data berhasil dimuat")
             } else {
-                prayerState = prayerState.mapValues { (_, _) -> PrayerState() }
-                sunnahState = SunnahState()
-                textInputState = TextInputState()
+                checklistState = ChecklistState.Success(
+                    prayerState = mapOf(
+                        "Subuh" to PrayerState(),
+                        "Dzuhur" to PrayerState(),
+                        "Ashar" to PrayerState(),
+                        "Maghrib" to PrayerState(),
+                        "Isya" to PrayerState()
+                    ),
+                    sunnahState = SunnahState(),
+                    textInputState = TextInputState()
+                )
+                Log.d("ChecklistIbadahScreen", "Dokumen tidak ada, inisialisasi data kosong")
             }
-            isLoaded = true
-        }.addOnFailureListener {
-            Toast.makeText(context, "Gagal memuat data", Toast.LENGTH_SHORT).show()
-            prayerState = prayerState.mapValues { (_, _) -> PrayerState() }
-            sunnahState = SunnahState()
-            textInputState = TextInputState()
-            isLoaded = true
+        } catch (e: Exception) {
+            checklistState = ChecklistState.Error("Gagal memuat data: ${e.message}")
+            Log.e("ChecklistIbadahScreen", "Error memuat data: ${e.message}", e)
         }
     }
 
-    fun saveChecklist() {
-        val uid = auth.currentUser?.uid ?: return
+    fun saveChecklist(
+        prayerState: Map<String, PrayerState>,
+        sunnahState: SunnahState,
+        textInputState: TextInputState
+    ) {
+        val uid = auth.currentUser?.uid ?: run {
+            Toast.makeText(context, "User tidak terautentikasi", Toast.LENGTH_SHORT).show()
+            Log.e("ChecklistIbadahScreen", "Gagal menyimpan: User tidak terautentikasi")
+            return
+        }
         val checklistData = hashMapOf<String, Any>(
             "date" to selectedDate
         ).apply {
@@ -165,25 +212,25 @@ fun ChecklistIbadahScreen() {
             put("syukur", textInputState.syukur)
         }
 
+        Log.d("ChecklistIbadahScreen", "Menyimpan data: $checklistData")
         firestore.collection("users").document(uid)
             .collection("checklists").document(selectedDate)
             .set(checklistData)
             .addOnSuccessListener {
-                val todayFormat = dateFormat.format(Date())
-                if (selectedDate == todayFormat) {
-                    Toast.makeText(context, "Checklist ibadah hari ini berhasil disimpan", Toast.LENGTH_SHORT).show()
+                val date = dateFormat.parse(selectedDate)?.let { displayFormat.format(it) } ?: selectedDate
+                Toast.makeText(context, "Checklist ibadah tanggal $date disimpan", Toast.LENGTH_SHORT).show()
+                Log.d("ChecklistIbadahScreen", "Checklist disimpan untuk tanggal $date")
+                if (selectedDate == todayDate) {
                     val intent = Intent(context, FeaturesListActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
                     }
                     context.startActivity(intent)
                     (context as? ChecklistIbadahActivity)?.finish()
-                } else {
-                    val date = dateFormat.parse(selectedDate)?.let { displayFormat.format(it) } ?: selectedDate
-                    Toast.makeText(context, "Checklist ibadah tanggal $date berhasil disimpan", Toast.LENGTH_SHORT).show()
                 }
             }
-            .addOnFailureListener {
+            .addOnFailureListener { e ->
                 Toast.makeText(context, "Gagal menyimpan checklist", Toast.LENGTH_SHORT).show()
+                Log.e("ChecklistIbadahScreen", "Gagal menyimpan checklist: ${e.message}", e)
             }
     }
 
@@ -201,165 +248,226 @@ fun ChecklistIbadahScreen() {
             modifier = Modifier.fillMaxSize(),
             color = Color(0xFFADD8E6)
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
-                        tonalElevation = 4.dp
+            when (checklistState) {
+                is ChecklistState.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Header(
-                            selectedDate = selectedDate,
-                            dateFormat = dateFormat,
-                            displayFormat = displayFormat,
-                            onBackClick = { (context as? ChecklistIbadahActivity)?.finish() }
-                        )
-                    }
-
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
-                        tonalElevation = 4.dp
-                    ) {
-                        DatePickerSection(
-                            selectedDate = selectedDate,
-                            onDateSelected = { selectedDate = it },
-                            dateFormat = dateFormat,
-                            displayFormat = displayFormat
+                        CircularProgressIndicator(
+                            color = Color(0xFF4CAF50),
+                            modifier = Modifier.size(48.dp)
                         )
                     }
                 }
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .offset(y = panelOffsetY)
-                        .background(
-                            color = Color(0xFFF1F8E9),
-                            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
-                        )
-
-                        .draggable(
-                            orientation = Orientation.Vertical,
-                            state = rememberDraggableState { delta ->
-                                val deltaDp = with(density) { delta.toDp() }
-                                val newOffset = panelOffsetY + deltaDp
-                                panelOffsetY = newOffset.coerceIn(minOffsetY, maxOffsetY)
-                            }
-                        ),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
+                is ChecklistState.Success -> {
+                    val state = checklistState as ChecklistState.Success
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp, bottom = 8.dp)
-                            .height(4.dp)
-                            .width(40.dp)
-                            .background(Color.Gray, shape = RoundedCornerShape(2.dp))
-                            .align(Alignment.CenterHorizontally)
-                    )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        Surface(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
-                            tonalElevation = 4.dp
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            PrayerSection(
-                                prayerState = prayerState,
-                                onPrayerStateChange = { prayer, newState ->
-                                    prayerState = prayerState.toMutableMap().apply { put(prayer, newState) }
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                tonalElevation = 4.dp
+                            ) {
+                                Header(
+                                    selectedDate = selectedDate,
+                                    todayDate = todayDate,
+                                    dateFormat = dateFormat,
+                                    displayFormat = displayFormat,
+                                    onBackClick = { (context as? ChecklistIbadahActivity)?.finish() }
+                                )
+                            }
+
+                            Surface(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                tonalElevation = 4.dp
+                            ) {
+                                DatePickerSection(
+                                    selectedDate = selectedDate,
+                                    onDateSelected = { selectedDate = it },
+                                    dateFormat = dateFormat,
+                                    displayFormat = displayFormat
+                                )
+                            }
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .offset(y = panelOffsetY)
+                                .background(
+                                    color = Color(0xFFF1F8E9),
+                                    shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+                                )
+                                .draggable(
+                                    orientation = Orientation.Vertical,
+                                    state = rememberDraggableState { delta ->
+                                        val deltaDp = with(density) { delta.toDp() }
+                                        val newOffset = panelOffsetY + deltaDp
+                                        panelOffsetY = newOffset.coerceIn(minOffsetY, maxOffsetY)
+                                    }
+                                ),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp, bottom = 8.dp)
+                                    .height(4.dp)
+                                    .width(40.dp)
+                                    .background(Color.Gray, shape = RoundedCornerShape(2.dp))
+                                    .align(Alignment.CenterHorizontally)
+                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .verticalScroll(rememberScrollState()),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                    tonalElevation = 4.dp
+                                ) {
+                                    PrayerSection(
+                                        prayerState = state.prayerState,
+                                        onPrayerStateChange = { prayer, newState ->
+                                            checklistState = ChecklistState.Success(
+                                                prayerState = state.prayerState.toMutableMap().apply { put(prayer, newState) },
+                                                sunnahState = state.sunnahState,
+                                                textInputState = state.textInputState
+                                            )
+                                        }
+                                    )
                                 }
-                            )
-                        }
 
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
-                            tonalElevation = 4.dp
-                        ) {
-                            QuranSection(
-                                quranFrom = textInputState.quranFrom,
-                                quranTo = textInputState.quranTo,
-                                onQuranFromChange = {
-                                    textInputState = textInputState.copy(quranFrom = it)
-                                },
-                                onQuranToChange = {
-                                    textInputState = textInputState.copy(quranTo = it)
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                    tonalElevation = 4.dp
+                                ) {
+                                    QuranSection(
+                                        quranFrom = state.textInputState.quranFrom,
+                                        quranTo = state.textInputState.quranTo,
+                                        onQuranFromChange = {
+                                            checklistState = ChecklistState.Success(
+                                                prayerState = state.prayerState,
+                                                sunnahState = state.sunnahState,
+                                                textInputState = state.textInputState.copy(quranFrom = it)
+                                            )
+                                        },
+                                        onQuranToChange = {
+                                            checklistState = ChecklistState.Success(
+                                                prayerState = state.prayerState,
+                                                sunnahState = state.sunnahState,
+                                                textInputState = state.textInputState.copy(quranTo = it)
+                                            )
+                                        }
+                                    )
                                 }
-                            )
-                        }
 
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
-                            tonalElevation = 4.dp
-                        ) {
-                            HarapanSection(
-                                harapan = textInputState.harapan,
-                                onHarapanChange = {
-                                    textInputState = textInputState.copy(harapan = it)
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                    tonalElevation = 4.dp
+                                ) {
+                                    HarapanSection(
+                                        harapan = state.textInputState.harapan,
+                                        onHarapanChange = {
+                                            checklistState = ChecklistState.Success(
+                                                prayerState = state.prayerState,
+                                                sunnahState = state.sunnahState,
+                                                textInputState = state.textInputState.copy(harapan = it)
+                                            )
+                                        }
+                                    )
                                 }
-                            )
-                        }
 
-                        Divider(color = Color(0xFFC5E1A5))
+                                HorizontalDivider(color = Color(0xFFC5E1A5))
 
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
-                            tonalElevation = 4.dp
-                        ) {
-                            SunnahSection(
-                                sunnahState = sunnahState,
-                                onSunnahStateChange = { sunnahState = it },
-                                isLoaded = isLoaded
-                            )
-                        }
-
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
-                            tonalElevation = 4.dp
-                        ) {
-                            SyukurSection(
-                                syukur = textInputState.syukur,
-                                onSyukurChange = {
-                                    textInputState = textInputState.copy(syukur = it)
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                    tonalElevation = 4.dp
+                                ) {
+                                    SunnahSection(
+                                        sunnahState = state.sunnahState,
+                                        onSunnahStateChange = {
+                                            checklistState = ChecklistState.Success(
+                                                prayerState = state.prayerState,
+                                                sunnahState = it,
+                                                textInputState = state.textInputState
+                                            )
+                                        },
+                                        isLoaded = true
+                                    )
                                 }
-                            )
-                        }
 
-                        Button(
-                            onClick = { saveChecklist() },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6F61)),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text("Simpan", color = Color.White, fontSize = 16.sp)
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                    tonalElevation = 4.dp
+                                ) {
+                                    SyukurSection(
+                                        syukur = state.textInputState.syukur,
+                                        onSyukurChange = {
+                                            checklistState = ChecklistState.Success(
+                                                prayerState = state.prayerState,
+                                                sunnahState = state.sunnahState,
+                                                textInputState = state.textInputState.copy(syukur = it)
+                                            )
+                                        })
+                                }
+
+                                // Di dalam ChecklistIbadahScreen, perbaiki bagian Button:
+                                Button(
+                                    onClick = {
+                                        saveChecklist(
+                                            state.prayerState,
+                                            state.sunnahState,
+                                            state.textInputState
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(48.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFFFF6F61)
+                                    )
+                                ) {
+                                    Text(
+                                        text = "Simpan",
+                                        color = Color.White,
+                                        fontSize = 16.sp
+                                    )
+                                }
+                            }
                         }
                     }
+                }
+                is ChecklistState.Error -> {
+                    Text(
+                        modifier=Modifier.fillMaxSize(),
+                        text = "Terjadi kesalahan, coba lagi nanti",
+                        color = Color(0xFF1B5E20),
+                        fontSize = 16.sp
+                    )
                 }
             }
         }
@@ -369,6 +477,7 @@ fun ChecklistIbadahScreen() {
 @Composable
 fun Header(
     selectedDate: String,
+    todayDate: String,
     dateFormat: SimpleDateFormat,
     displayFormat: SimpleDateFormat,
     onBackClick: () -> Unit
@@ -380,16 +489,16 @@ fun Header(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = Icons.Default.ArrowBack,
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Back",
             modifier = Modifier
                 .size(24.dp)
                 .clickable { onBackClick() },
             tint = Color(0xFF1B5E20)
         )
-        Spacer(Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(16.dp))
         Text(
-            text = if (selectedDate == dateFormat.format(Date()))
+            text = if (selectedDate == todayDate)
                 "Sudahkah kamu beribadah hari ini?"
             else
                 "Ibadah pada ${displayFormat.format(dateFormat.parse(selectedDate) ?: Date())}",
@@ -417,9 +526,10 @@ fun DatePickerSection(
     calendar.time = dateFormat.parse(selectedDate) ?: Date()
     var currentMonth by remember { mutableStateOf(calendar.clone() as Calendar) }
     val monthFormat = SimpleDateFormat("MMMM yyyy", Locale("id", "ID"))
+    var dragOffsetX by remember { mutableFloatStateOf(0f) }
 
     currentMonth.set(Calendar.DAY_OF_MONTH, 1)
-    val firstDayOfMonth = currentMonth.get(Calendar.DAY_OF_WEEK) - 1 // 0 = Sunday
+    val firstDayOfMonth = currentMonth.get(Calendar.DAY_OF_WEEK) - 1
     val daysInMonth = currentMonth.getActualMaximum(Calendar.DAY_OF_MONTH)
 
     Box(
@@ -427,6 +537,26 @@ fun DatePickerSection(
             .fillMaxWidth()
             .padding(16.dp)
             .background(Color(0xFFBBDEFB), RoundedCornerShape(12.dp))
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onDragEnd = {
+                        if (dragOffsetX < -100f) {
+                            Log.d("DatePickerSection", "Swipe kiri: ke bulan berikutnya")
+                            currentMonth.add(Calendar.MONTH, 1)
+                            currentMonth = currentMonth.clone() as Calendar
+                        } else if (dragOffsetX > 100f) {
+                            Log.d("DatePickerSection", "Swipe kanan: ke bulan sebelumnya")
+                            currentMonth.add(Calendar.MONTH, -1)
+                            currentMonth = currentMonth.clone() as Calendar
+                        }
+                        dragOffsetX = 0f
+                    },
+                    onHorizontalDrag = { change, dragAmount ->
+                        dragOffsetX += dragAmount
+                        change.consume()
+                    }
+                )
+            }
     ) {
         Column(
             modifier = Modifier
@@ -439,11 +569,12 @@ fun DatePickerSection(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Icon(
-                    imageVector = Icons.Default.KeyboardArrowLeft,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                     contentDescription = "Previous Month",
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
+                            Log.d("DatePickerSection", "Klik tombol bulan sebelumnya")
                             currentMonth.add(Calendar.MONTH, -1)
                             currentMonth = currentMonth.clone() as Calendar
                         },
@@ -457,11 +588,12 @@ fun DatePickerSection(
                     textAlign = TextAlign.Center
                 )
                 Icon(
-                    imageVector = Icons.Default.KeyboardArrowRight,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "Next Month",
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
+                            Log.d("DatePickerSection", "Klik tombol bulan berikutnya")
                             currentMonth.add(Calendar.MONTH, 1)
                             currentMonth = currentMonth.clone() as Calendar
                         },
@@ -515,6 +647,7 @@ fun DatePickerSection(
                                             else Color.Transparent
                                         )
                                         .clickable {
+                                            Log.d("DatePickerSection", "Tanggal dipilih: $dateStr")
                                             onDateSelected(dateStr)
                                         },
                                     contentAlignment = Alignment.Center
@@ -696,7 +829,12 @@ fun HarapanSection(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text("Harapan/Doa untuk hari esok:", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1B5E20))
+        Text(
+            "Harapan/Doa untuk hari esok:",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1B5E20)
+        )
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
             value = harapan,
@@ -726,39 +864,33 @@ fun SunnahSection(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text("Ibadah Sunnah:", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1B5E20))
+        Text(
+            "Ibadah Sunnah:",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1B5E20)
+        )
         Spacer(Modifier.height(8.dp))
         val sunnahItems: List<Pair<String, (Boolean) -> SunnahState>> = listOf(
             "Shalat Dhuha" to { value: Boolean -> sunnahState.copy(dhuha = value) },
             "Shalat Tahajud" to { value: Boolean -> sunnahState.copy(tahajud = value) },
             "Shalat Rawatib" to { value: Boolean -> sunnahState.copy(rawatib = value) },
             "Puasa Sunnah" to { value: Boolean -> sunnahState.copy(puasaSunnah = value) },
-            "Dzikir Pagi" to { value: Boolean ->
+            "Dzikir" to { value: Boolean ->
                 if (isLoaded) {
                     Toast.makeText(
                         context,
-                        if (value) "Masya Allah! Dzikir paginya jangan sampai ketinggalan ya!"
-                        else "Yuk semangat mulai dzikir pagi!",
-                        Toast.LENGTH_SHORT
+                        if (value) "Masya Allah! Dzikirnya jangan sampai ketinggalan ya!"
+                        else "Yuk semangat mulai dzikir!",
+                        Toast.LENGTH_LONG
                     ).show()
                 }
-                sunnahState.copy(dzikirPagi = value)
-            },
-            "Dzikir Petang" to { value: Boolean ->
-                if (isLoaded) {
-                    Toast.makeText(
-                        context,
-                        if (value) "Masya Allah! Dzikir petang udah dilakukan~"
-                        else "Dzikir petang jangan lupa yaa 🥹",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                sunnahState.copy(dzikirPetang = value)
+                sunnahState.copy(dzikirPagi = value, dzikirPetang = value)
             },
             "Shalawat Nabi" to { value: Boolean -> sunnahState.copy(shalawat = value) },
             "Istighfar" to { value: Boolean -> sunnahState.copy(istighfar = value) },
             "Muhasabah" to { value: Boolean -> sunnahState.copy(muhasabah = value) },
-            "Hafalan Surah" to { value: Boolean -> sunnahState.copy(hafalan = value) }
+            "Hafalan" to { value: Boolean -> sunnahState.copy(hafalan = value) }
         )
 
         sunnahItems.forEach { (name, updateState) ->
@@ -767,12 +899,11 @@ fun SunnahSection(
                 "Shalat Tahajud" -> sunnahState.tahajud
                 "Shalat Rawatib" -> sunnahState.rawatib
                 "Puasa Sunnah" -> sunnahState.puasaSunnah
-                "Dzikir Pagi" -> sunnahState.dzikirPagi
-                "Dzikir Petang" -> sunnahState.dzikirPetang
+                "Dzikir" -> sunnahState.dzikirPagi || sunnahState.dzikirPetang
                 "Shalawat Nabi" -> sunnahState.shalawat
                 "Istighfar" -> sunnahState.istighfar
                 "Muhasabah" -> sunnahState.muhasabah
-                "Hafalan Surah" -> sunnahState.hafalan
+                "Hafalan" -> sunnahState.hafalan
                 else -> false
             }
 
@@ -782,7 +913,12 @@ fun SunnahSection(
                     .padding(vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(name, modifier = Modifier.weight(3f), fontSize = 14.sp, color = Color(0xFF1B5E20))
+                Text(
+                    text = name,
+                    modifier = Modifier.weight(3f),
+                    fontSize = 14.sp,
+                    color = Color(0xFF1B5E20)
+                )
                 Checkbox(
                     checked = isChecked,
                     onCheckedChange = { newValue ->
@@ -806,7 +942,7 @@ fun SyukurSection(
             .padding(16.dp)
     ) {
         Text(
-            "Hari ini aku bersyukur karena...",
+            "Hari ini aku bersyukur karena:",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF1B5E20)
@@ -817,7 +953,7 @@ fun SyukurSection(
             onValueChange = onSyukurChange,
             placeholder = {
                 Text(
-                    "Tuliskan rasa syukurmu hari ini...",
+                    "Tulis rasa syukurmu hari ini...",
                     color = Color(0xFFB0BEC5)
                 )
             },
