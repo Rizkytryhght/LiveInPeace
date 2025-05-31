@@ -10,16 +10,30 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.liveinpeace.MainActivity
 import com.example.liveinpeace.R
+import com.example.liveinpeace.data.ProfileModel
+import com.example.liveinpeace.data.repository.ProfileRepository
 import com.example.liveinpeace.viewModel.AuthViewModel
+import com.example.liveinpeace.viewModel.ProfileViewModel
+import com.example.liveinpeace.viewModel.ProfileViewModelFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class AuthActivity : AppCompatActivity() {
-    private lateinit var viewModel: AuthViewModel
+    private lateinit var authViewModel: AuthViewModel
+    private lateinit var profileViewModel: ProfileViewModel
+    private lateinit var profileRepository: ProfileRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+        authViewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+        profileRepository = ProfileRepository(applicationContext)
+        profileViewModel = ViewModelProvider(
+            this,
+            ProfileViewModelFactory(profileRepository)
+        )[ProfileViewModel::class.java]
 
         val emailField = findViewById<EditText>(R.id.emailEditText)
         val passwordField = findViewById<EditText>(R.id.passwordEditText)
@@ -32,11 +46,23 @@ class AuthActivity : AppCompatActivity() {
             val password = passwordField.text.toString()
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
-                viewModel.login(email, password) { success, message ->
+                authViewModel.login(email, password) { success, message ->
                     if (success) {
-                        Toast.makeText(this, "Login berhasil!", Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this, MainActivity::class.java))
-                        finish()
+                        // Sinkron profil dari Firestore ke Room DB
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val profile = profileRepository.syncProfileFromFirestore()
+                            if (profile.email.isNotEmpty()) {
+                                runOnUiThread {
+                                    Toast.makeText(this@AuthActivity, "Login berhasil!", Toast.LENGTH_SHORT).show()
+                                    startActivity(Intent(this@AuthActivity, MainActivity::class.java))
+                                    finish()
+                                }
+                            } else {
+                                runOnUiThread {
+                                    Toast.makeText(this@AuthActivity, "Error: Profil tidak ditemukan.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
                     } else {
                         Toast.makeText(this, "Error: $message", Toast.LENGTH_SHORT).show()
                     }

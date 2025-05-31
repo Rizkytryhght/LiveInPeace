@@ -3,65 +3,89 @@ package com.example.liveinpeace.data.repository
 import com.example.liveinpeace.model.MoodEntry
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MoodRepository {
-    private val firestore = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
-    private val moodsFlow = MutableStateFlow<List<MoodEntry>>(emptyList())
-
-    init {
-        listenToMoods()
-    }
-
-    private fun listenToMoods() {
-        val userId = auth.currentUser?.uid ?: return
-        firestore.collection("users")
-            .document(userId)
-            .collection("mood_entries")
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    println("Error listening to moods: ${error.message}")
-                    return@addSnapshotListener
-                }
-                val moodList = snapshot?.documents?.mapNotNull { doc ->
-                    try {
-                        doc.toObject(MoodEntry::class.java)
-                    } catch (e: Exception) {
-                        println("Error parsing mood entry: ${e.message}")
-                        null
-                    }
-                } ?: emptyList()
-
-                moodsFlow.value = moodList
-            }
-    }
-
-    fun getAllMoods(): Flow<List<MoodEntry>> {
-        return moodsFlow
-    }
-
-    suspend fun saveMood(mood: String) {
+class MoodRepository(
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+) {
+    suspend fun saveMood(mood: String): Boolean {
         val userId = auth.currentUser?.uid ?: throw IllegalStateException("User not logged in")
         val today = getTodayDate()
         val moodEntry = MoodEntry(
             mood = mood,
             timestamp = System.currentTimeMillis()
         )
-        try {
-            firestore.collection("users")
-                .document(userId)
-                .collection("mood_entries")
-                .document(today)
-                .set(moodEntry)
-                .await()
+        return try {
+            withContext(Dispatchers.IO) {
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("mood_entries")
+                    .document(today)
+                    .set(moodEntry)
+                    .await()
+                println("Mood saved: $mood on $today")
+                true
+            }
         } catch (e: Exception) {
             println("Error saving mood: ${e.message}")
-            throw Exception("Failed to save mood: ${e.message}")
+            false
+        }
+    }
+
+    suspend fun getMoodsLast7Days(): List<MoodEntry> {
+        val userId = auth.currentUser?.uid ?: return emptyList()
+        val calendar = Calendar.getInstance()
+        val endTime = calendar.timeInMillis
+        calendar.add(Calendar.DAY_OF_YEAR, -7)
+        val startTime = calendar.timeInMillis
+
+        return try {
+            withContext(Dispatchers.IO) {
+                val snapshot = firestore.collection("users")
+                    .document(userId)
+                    .collection("mood_entries")
+                    .whereGreaterThanOrEqualTo("timestamp", startTime)
+                    .whereLessThanOrEqualTo("timestamp", endTime)
+                    .get()
+                    .await()
+                val moods = snapshot.documents.mapNotNull { doc ->
+                    try {
+                        doc.toObject(MoodEntry::class.java)
+                    } catch (e: Exception) {
+                        println("Error parsing mood entry: ${e.message}")
+                        null
+                    }
+                }
+                println("Fetched ${moods.size} moods for last 7 days")
+                moods.sortedBy { it.timestamp }
+            }
+        } catch (e: Exception) {
+            println("Error fetching moods: ${e.message}")
+            emptyList()
+        }
+    }
+
+    suspend fun hasSubmittedMoodToday(): Boolean {
+        val userId = auth.currentUser?.uid ?: return false
+        val today = getTodayDate()
+        return try {
+            withContext(Dispatchers.IO) {
+                val snapshot = firestore.collection("users")
+                    .document(userId)
+                    .collection("mood_entries")
+                    .document(today)
+                    .get()
+                    .await()
+                snapshot.exists()
+            }
+        } catch (e: Exception) {
+            println("Error checking today's mood: ${e.message}")
+            false
         }
     }
 

@@ -16,8 +16,16 @@ class AuthViewModel : ViewModel() {
         repository.login(email, password, onComplete)
     }
 
-    fun register(email: String, password: String, firstName: String, lastName: String, onComplete: (Boolean, String?) -> Unit) {
-        repository.register(email, password, firstName, lastName, onComplete)
+    fun register(
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String,
+        gender: String,
+        phoneNumber: String,
+        onComplete: (Boolean, String?) -> Unit
+    ) {
+        repository.register(email, password, firstName, lastName, gender, phoneNumber, onComplete)
     }
 
     fun sendPasswordReset(email: String, onComplete: (Boolean, String?) -> Unit) {
