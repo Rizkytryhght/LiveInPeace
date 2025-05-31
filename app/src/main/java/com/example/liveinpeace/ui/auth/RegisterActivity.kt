@@ -12,21 +12,29 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.liveinpeace.R
+import com.example.liveinpeace.data.ProfileModel
+import com.example.liveinpeace.data.repository.ProfileRepository
 import com.example.liveinpeace.viewModel.AuthViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var viewModel: AuthViewModel
+    private lateinit var profileRepository: ProfileRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
         viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+        profileRepository = ProfileRepository(applicationContext)
 
         val firstNameField = findViewById<EditText>(R.id.firstNameEditText)
         val lastNameField = findViewById<EditText>(R.id.lastNameEditText)
         val emailField = findViewById<EditText>(R.id.emailEditText)
         val passwordField = findViewById<EditText>(R.id.passwordEditText)
+        val phoneField = findViewById<EditText>(R.id.phoneEditText)
         val registerButton = findViewById<Button>(R.id.registerButton)
         val backButton = findViewById<ImageView>(R.id.backButton)
         val loginPromptTextView = findViewById<TextView>(R.id.loginPromptTextView)
@@ -38,11 +46,10 @@ class RegisterActivity : AppCompatActivity() {
             genderOptions
         )
 
-        // Event untuk tombol back
         backButton.setOnClickListener {
             val intent = Intent(this, AuthActivity::class.java)
             startActivity(intent)
-            finish() // Menutup halaman register agar tidak bisa kembali ke sini dengan tombol back
+            finish()
         }
 
         registerButton.setOnClickListener {
@@ -50,15 +57,41 @@ class RegisterActivity : AppCompatActivity() {
             val lastName = lastNameField.text.toString()
             val email = emailField.text.toString()
             val password = passwordField.text.toString()
+            val phoneNumber = phoneField.text.toString()
             val selectedGender = genderSpinner.selectedItem.toString()
+
             if (selectedGender == "Pilih Gender") {
                 Toast.makeText(this, "Silakan pilih gender!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (email.isNotEmpty() && password.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty()) {
-                viewModel.register(email, password, firstName, lastName) { success, message ->
+                viewModel.register(
+                    email,
+                    password,
+                    firstName,
+                    lastName,
+                    selectedGender,
+                    phoneNumber
+                ) { success, message ->
                     if (success) {
+                        // Simpan data ke Room DB
+                        val profile = ProfileModel(
+                            firstName = firstName,
+                            lastName = lastName,
+                            email = email,
+                            gender = selectedGender,
+                            phoneNumber = phoneNumber,
+                            profileImagePath = ""
+                        )
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                profileRepository.saveProfile(profile)
+                                println("Profile saved to Room DB: $profile")
+                            } catch (e: Exception) {
+                                println("Failed to save profile to Room DB: ${e.message}")
+                            }
+                        }
                         Toast.makeText(this, "Registrasi berhasil!", Toast.LENGTH_SHORT).show()
                         finish() // Kembali ke login
                     } else {
@@ -69,10 +102,11 @@ class RegisterActivity : AppCompatActivity() {
                 Toast.makeText(this, "Semua data harus diisi!", Toast.LENGTH_SHORT).show()
             }
         }
+
         loginPromptTextView.setOnClickListener {
-            val intent = Intent(this, AuthActivity::class.java) // Sesuaikan jika halaman login berbeda
+            val intent = Intent(this, AuthActivity::class.java)
             startActivity(intent)
-            finish() // Menutup halaman register agar tidak kembali ke sini saat menekan tombol back
+            finish()
         }
 
         genderSpinner.adapter = adapter

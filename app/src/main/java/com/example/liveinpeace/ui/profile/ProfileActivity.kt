@@ -2,13 +2,13 @@ package com.example.liveinpeace.ui.profile
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.example.liveinpeace.R
 import com.example.liveinpeace.data.ProfileModel
 import com.example.liveinpeace.data.repository.ProfileRepository
@@ -97,15 +97,19 @@ class ProfileActivity : AppCompatActivity() {
         binding.profileUsername.text = profile.email
         binding.profileGender.text = profile.gender ?: "Tidak ditentukan"
         binding.profilePhone.text = profile.phoneNumber ?: "Tidak ditentukan"
-        if (profile.profileImagePath.isNotBlank()) {
+        if (profile.profileImagePath.isNotBlank() && File(profile.profileImagePath).exists()) {
             try {
-                binding.profileImage.setImageURI(Uri.fromFile(File(profile.profileImagePath)))
-                Log.d("ProfileActivity", "Memuat foto di ProfileActivity: ${profile.profileImagePath}")
+                Glide.with(this)
+                    .load(File(profile.profileImagePath))
+                    .error(R.drawable.user)
+                    .into(binding.profileImage)
+                Log.d("ProfileActivity", "Memuat foto dari: ${profile.profileImagePath}")
             } catch (e: Exception) {
                 Log.e("ProfileActivity", "Gagal memuat foto: ${e.message}", e)
                 binding.profileImage.setImageResource(R.drawable.user)
             }
         } else {
+            Log.d("ProfileActivity", "Foto tidak ditemukan, menggunakan default")
             binding.profileImage.setImageResource(R.drawable.user)
         }
     }

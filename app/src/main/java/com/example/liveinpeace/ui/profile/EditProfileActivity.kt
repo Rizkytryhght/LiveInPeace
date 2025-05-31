@@ -31,6 +31,7 @@ class EditProfileActivity : AppCompatActivity() {
         ProfileViewModelFactory(ProfileRepository(applicationContext))
     }
     private var selectedImageUri: Uri? = null
+    private var newImagePath: String? = null
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
@@ -66,21 +67,31 @@ class EditProfileActivity : AppCompatActivity() {
         }
 
         binding.updateProfileButton.setOnClickListener {
-            try {
-                val updatedProfile = collectFormData()
-                viewModel.updateProfile(updatedProfile)
-                selectedImageUri?.let { uri ->
-                    viewModel.saveProfileImageUri(uri.toString())
+            lifecycleScope.launch {
+                try {
+                    // Simpan foto dulu kalau ada
+                    selectedImageUri?.let { uri ->
+                        newImagePath = viewModel.saveProfileImageUri(uri.toString()).toString()
+                        Log.d("EditProfileActivity", "Foto baru disimpan di: $newImagePath")
+                        if (newImagePath.isNullOrEmpty()) {
+                            Toast.makeText(this@EditProfileActivity, "Gagal menyimpan foto", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    // Kumpulkan data profil
+                    val updatedProfile = collectFormData()
+                    viewModel.updateProfile(updatedProfile)
+
+                    Toast.makeText(this@EditProfileActivity, "Profil diperbarui", Toast.LENGTH_SHORT).show()
+                    Log.d("EditProfileActivity", "Profil disimpan: $updatedProfile")
+                    val intent = Intent(this@EditProfileActivity, ProfileActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
+                    finish()
+                } catch (e: Exception) {
+                    Log.e("EditProfileActivity", "Gagal menyimpan profil: ${e.message}", e)
+                    Toast.makeText(this@EditProfileActivity, "Gagal menyimpan profil", Toast.LENGTH_SHORT).show()
                 }
-                Toast.makeText(this, "Profile updated", Toast.LENGTH_SHORT).show()
-                Log.d("EditProfileActivity", "Profil disimpan: $updatedProfile")
-                val intent = Intent(this, ProfileActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                startActivity(intent)
-                finish()
-            } catch (e: Exception) {
-                Log.e("EditProfileActivity", "Gagal menyimpan profil: ${e.message}", e)
-                Toast.makeText(this, "Gagal menyimpan profil", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -102,7 +113,7 @@ class EditProfileActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
             pickImageLauncher.launch("image/*")
         } else {
-                requestPermissionLauncher.launch(permission)
+            requestPermissionLauncher.launch(permission)
         }
     }
 
@@ -125,7 +136,7 @@ class EditProfileActivity : AppCompatActivity() {
                 binding.genderSpinner.setText(profile.gender, false)
             }
             binding.phoneNumberEditText.setText(profile.phoneNumber)
-            if (profile.profileImagePath.isNotEmpty()) {
+            if (profile.profileImagePath.isNotEmpty() && File(profile.profileImagePath).exists()) {
                 try {
                     binding.profileImage.setImageURI(Uri.fromFile(File(profile.profileImagePath)))
                     Log.d("EditProfileActivity", "Memuat foto dari: ${profile.profileImagePath}")
@@ -148,7 +159,7 @@ class EditProfileActivity : AppCompatActivity() {
             email = binding.emailEditText.text?.toString() ?: "",
             gender = binding.genderSpinner.text?.toString() ?: "",
             phoneNumber = binding.phoneNumberEditText.text?.toString() ?: "",
-            profileImagePath = viewModel.profileState.value.profileImagePath // Gunakan path lama jika tidak ada foto baru
+            profileImagePath = newImagePath ?: viewModel.profileState.value.profileImagePath
         )
         Log.d("EditProfileActivity", "Data yang akan disimpan: $profile")
         return profile

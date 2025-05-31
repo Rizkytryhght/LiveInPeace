@@ -19,8 +19,12 @@
 
         <!-- Perbesar touch target dengan FrameLayout -->
         <FrameLayout
+            android:id="@+id/backButtonContainer"
             android:layout_width="48dp"
-            android:layout_height="48dp">
+            android:layout_height="48dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="Kembali">
 
             <ImageView
                 android:id="@+id/backButton"
@@ -28,11 +32,10 @@
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:adjustViewBounds="true"
-                android:clickable="true"
-                android:contentDescription="Kembali"
-                android:focusable="true"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_back_arrow" />
+                android:src="@drawable/ic_back_arrow"
+                android:importantForAccessibility="no"
+                android:duplicateParentState="true" />
         </FrameLayout>
 
         <TextView
@@ -145,15 +148,17 @@
         <AutoCompleteTextView
             android:id="@+id/genderSpinner"
             android:layout_width="match_parent"
-            android:inputType="none"
             android:layout_height="56dp"
+            android:hint="Jenis kelamin"
+            android:inputType="none"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:textSize="16sp"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:hint="Jenis kelamin"
             android:background="@android:color/white"
-            android:elevation="2dp"
-            android:contentDescription="Pilih jenis kelamin" />
+            android:elevation="2dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- Phone Number -->
