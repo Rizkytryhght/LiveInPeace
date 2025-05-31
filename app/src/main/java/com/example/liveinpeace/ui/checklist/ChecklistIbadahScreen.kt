@@ -236,17 +236,17 @@ fun ChecklistIbadahScreen(
 
     MaterialTheme(
         colorScheme = lightColorScheme(
-            primary = Color(0xFF4CAF50),
+            primary = Color(0xFF2E7D32),
             onPrimary = Color.White,
-            surface = Color(0xFFF1F8E9),
+            surface = Color(0xFFE8F5E9),
             onSurface = Color(0xFF1B5E20),
-            background = Color(0xFFE8F5E9),
+            background = Color(0xFFF1F8E9),
             onBackground = Color(0xFF1B5E20),
         )
     ) {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = Color(0xFFADD8E6)
+            color = Color(0xFF2E7D32)
         ) {
             when (checklistState) {
                 is ChecklistState.Loading -> {
@@ -255,7 +255,7 @@ fun ChecklistIbadahScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = Color(0xFF4CAF50),
+                            color = Color(0xFF2E7D32),
                             modifier = Modifier.size(48.dp)
                         )
                     }
@@ -274,7 +274,7 @@ fun ChecklistIbadahScreen(
                             Surface(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                    .background(Color.White, RoundedCornerShape(12.dp)),
                                 tonalElevation = 4.dp
                             ) {
                                 Header(
@@ -289,7 +289,7 @@ fun ChecklistIbadahScreen(
                             Surface(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                    .background(Color.White, RoundedCornerShape(12.dp)),
                                 tonalElevation = 4.dp
                             ) {
                                 DatePickerSection(
@@ -306,7 +306,7 @@ fun ChecklistIbadahScreen(
                                 .fillMaxWidth()
                                 .offset(y = panelOffsetY)
                                 .background(
-                                    color = Color(0xFFF1F8E9),
+                                    color = Color.White,
                                     shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
                                 )
                                 .draggable(
@@ -325,7 +325,7 @@ fun ChecklistIbadahScreen(
                                     .padding(top = 8.dp, bottom = 8.dp)
                                     .height(4.dp)
                                     .width(40.dp)
-                                    .background(Color.Gray, shape = RoundedCornerShape(2.dp))
+                                    .background(Color.White, shape = RoundedCornerShape(2.dp))
                                     .align(Alignment.CenterHorizontally)
                             )
                             Column(
@@ -338,7 +338,7 @@ fun ChecklistIbadahScreen(
                                 Surface(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                        .background(Color.White, RoundedCornerShape(12.dp)),
                                     tonalElevation = 4.dp
                                 ) {
                                     PrayerSection(
@@ -356,7 +356,7 @@ fun ChecklistIbadahScreen(
                                 Surface(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                        .background(Color.White, RoundedCornerShape(12.dp)),
                                     tonalElevation = 4.dp
                                 ) {
                                     QuranSection(
@@ -382,7 +382,7 @@ fun ChecklistIbadahScreen(
                                 Surface(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                        .background(Color.White, RoundedCornerShape(12.dp)),
                                     tonalElevation = 4.dp
                                 ) {
                                     HarapanSection(
@@ -397,12 +397,12 @@ fun ChecklistIbadahScreen(
                                     )
                                 }
 
-                                HorizontalDivider(color = Color(0xFFC5E1A5))
+                                HorizontalDivider(color = Color.White)
 
                                 Surface(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                        .background(Color.White, RoundedCornerShape(12.dp)),
                                     tonalElevation = 4.dp
                                 ) {
                                     SunnahSection(
@@ -421,7 +421,7 @@ fun ChecklistIbadahScreen(
                                 Surface(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(Color(0xFFF1F8E9), RoundedCornerShape(12.dp)),
+                                        .background(Color.White, RoundedCornerShape(12.dp)),
                                     tonalElevation = 4.dp
                                 ) {
                                     SyukurSection(
@@ -448,7 +448,7 @@ fun ChecklistIbadahScreen(
                                         .fillMaxWidth()
                                         .height(48.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(0xFFFF6F61)
+                                        containerColor = Color(0xFF2E7D32)
                                     )
                                 ) {
                                     Text(
@@ -485,6 +485,7 @@ fun Header(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .background(Color(0xFF2E7D32), RoundedCornerShape(12.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -494,17 +495,17 @@ fun Header(
             modifier = Modifier
                 .size(24.dp)
                 .clickable { onBackClick() },
-            tint = Color(0xFF1B5E20)
+            tint = Color.White
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
             text = if (selectedDate == todayDate)
-                "Sudahkah kamu beribadah hari ini?"
+                "Sudahkah kamu beribadah?"
             else
                 "Ibadah pada ${displayFormat.format(dateFormat.parse(selectedDate) ?: Date())}",
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1B5E20),
+            color = Color.White,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 8.dp),
@@ -536,7 +537,7 @@ fun DatePickerSection(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .background(Color(0xFFBBDEFB), RoundedCornerShape(12.dp))
+            .background(Color(0xFF2E7D32), RoundedCornerShape(12.dp))
             .pointerInput(Unit) {
                 detectHorizontalDragGestures(
                     onDragEnd = {
@@ -562,7 +563,8 @@ fun DatePickerSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-        ) {
+        )
+        {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -578,13 +580,13 @@ fun DatePickerSection(
                             currentMonth.add(Calendar.MONTH, -1)
                             currentMonth = currentMonth.clone() as Calendar
                         },
-                    tint = Color(0xFF1B5E20)
+                    tint = Color.White
                 )
                 Text(
                     text = monthFormat.format(currentMonth.time),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1B5E20),
+                    color = Color.White,
                     textAlign = TextAlign.Center
                 )
                 Icon(
@@ -597,7 +599,7 @@ fun DatePickerSection(
                             currentMonth.add(Calendar.MONTH, 1)
                             currentMonth = currentMonth.clone() as Calendar
                         },
-                    tint = Color(0xFF1B5E20)
+                    tint = Color.White
                 )
             }
 
@@ -612,7 +614,7 @@ fun DatePickerSection(
                         text = day,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1B5E20),
+                        color = Color.White,
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center
                     )
@@ -643,7 +645,7 @@ fun DatePickerSection(
                                         .aspectRatio(1f)
                                         .clip(CircleShape)
                                         .background(
-                                            if (isSelected) Color(0xFF4CAF50).copy(alpha = 0.3f)
+                                            if (isSelected) Color.White.copy(alpha = 0.3f)
                                             else Color.Transparent
                                         )
                                         .clickable {
@@ -655,7 +657,7 @@ fun DatePickerSection(
                                     if (isToday) {
                                         Canvas(modifier = Modifier.size(24.dp)) {
                                             drawCircle(
-                                                color = Color(0xFF4CAF50),
+                                                color = Color.White,
                                                 radius = size.minDimension / 2,
                                                 style = Stroke(width = 2.dp.toPx())
                                             )
@@ -664,7 +666,7 @@ fun DatePickerSection(
                                     Text(
                                         text = dayIndex.toString(),
                                         fontSize = 14.sp,
-                                        color = if (isSelected) Color(0xFF4CAF50) else Color(0xFF1B5E20),
+                                        color = if (isSelected) Color(0xFF2E7D32) else Color.White,
                                         textAlign = TextAlign.Center
                                     )
                                 }
@@ -692,7 +694,7 @@ fun PrayerSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFBBDEFB), RoundedCornerShape(8.dp))
+                .background(Color(0xFFC8E6C9), RoundedCornerShape(8.dp))
                 .padding(8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -700,7 +702,7 @@ fun PrayerSection(
                 Text(
                     it,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1B5E20),
+                    color = Color(0xFF2E7D32),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f)
                 )
@@ -714,7 +716,7 @@ fun PrayerSection(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
-                    .background(Color(0xFFE0F7FA), RoundedCornerShape(8.dp)),
+                    .background(Color(0xFFE8F5E9), RoundedCornerShape(8.dp)),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -723,7 +725,7 @@ fun PrayerSection(
                         .weight(1f)
                         .padding(4.dp),
                     fontSize = 16.sp,
-                    color = Color(0xFF1B5E20),
+                    color = Color(0xFF2E7D32),
                     textAlign = TextAlign.Center
                 )
 
@@ -731,21 +733,21 @@ fun PrayerSection(
                     checked = state.tepat,
                     onCheckedChange = { onPrayerStateChange(prayer, state.copy(tepat = it)) },
                     modifier = Modifier.weight(1f),
-                    colors = CheckboxDefaults.colors(checkedColor = Color(0xFF4CAF50))
+                    colors = CheckboxDefaults.colors(checkedColor = Color(0xFF2E7D32))
                 )
 
                 Checkbox(
                     checked = state.qadha,
                     onCheckedChange = { onPrayerStateChange(prayer, state.copy(qadha = it)) },
                     modifier = Modifier.weight(1f),
-                    colors = CheckboxDefaults.colors(checkedColor = Color(0xFF4CAF50))
+                    colors = CheckboxDefaults.colors(checkedColor = Color(0xFF2E7D32))
                 )
 
                 Checkbox(
                     checked = state.badiyah,
                     onCheckedChange = { onPrayerStateChange(prayer, state.copy(badiyah = it)) },
                     modifier = Modifier.weight(1f),
-                    colors = CheckboxDefaults.colors(checkedColor = Color(0xFF4CAF50))
+                    colors = CheckboxDefaults.colors(checkedColor = Color(0xFF2E7D32))
                 )
             }
         }
@@ -772,29 +774,29 @@ fun QuranSection(
                 imageVector = Icons.Default.Book,
                 contentDescription = "Quran",
                 modifier = Modifier.size(24.dp),
-                tint = Color(0xFF1B5E20)
+                tint = Color(0xFF2E7D32)
             )
             Spacer(Modifier.width(8.dp))
             Text(
                 "Tilawah Al-Quran:",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF1B5E20)
+                color = Color(0xFF2E7D32)
             )
         }
 
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("Dari: ", modifier = Modifier.padding(end = 8.dp), color = Color(0xFF1B5E20))
+            Text("Dari: ", modifier = Modifier.padding(end = 8.dp), color = Color(0xFF2E7D32))
             OutlinedTextField(
                 value = quranFrom,
                 onValueChange = onQuranFromChange,
                 placeholder = { Text("Al-Baqarah ayat 1") },
                 modifier = Modifier.weight(1f),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF4CAF50),
-                    unfocusedBorderColor = Color(0xFFB0BEC5),
-                    cursorColor = Color(0xFF1B5E20),
-                    focusedLabelColor = Color(0xFF4CAF50)
+                    focusedBorderColor = Color(0xFF2E7D32),
+                    unfocusedBorderColor = Color(0xFF81C784),
+                    cursorColor = Color(0xFF2E7D32),
+                    focusedLabelColor = Color(0xFF2E7D32)
                 )
             )
         }
@@ -802,17 +804,17 @@ fun QuranSection(
         Spacer(Modifier.height(8.dp))
 
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text("Sampai: ", modifier = Modifier.padding(end = 8.dp), color = Color(0xFF1B5E20))
+            Text("Sampai: ", modifier = Modifier.padding(end = 8.dp), color = Color(0xFF2E7D32))
             OutlinedTextField(
                 value = quranTo,
                 onValueChange = onQuranToChange,
                 placeholder = { Text("Al-Baqarah ayat 10") },
                 modifier = Modifier.weight(1f),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF4CAF50),
-                    unfocusedBorderColor = Color(0xFFB0BEC5),
-                    cursorColor = Color(0xFF1B5E20),
-                    focusedLabelColor = Color(0xFF4CAF50)
+                    focusedBorderColor = Color(0xFF2E7D32),
+                    unfocusedBorderColor = Color(0xFF81C784),
+                    cursorColor = Color(0xFF2E7D32),
+                    focusedLabelColor = Color(0xFF2E7D32)
                 )
             )
         }
@@ -833,20 +835,20 @@ fun HarapanSection(
             "Harapan/Doa untuk hari esok:",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1B5E20)
+            color = Color(0xFF2E7D32)
         )
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
             value = harapan,
             onValueChange = onHarapanChange,
-            placeholder = { Text("Semoga Allah memberikan berkah...", color = Color(0xFFB0BEC5)) },
+            placeholder = { Text("Semoga Allah memberikan berkah...", color = Color(0xFF81C784)) },
             modifier = Modifier.fillMaxWidth(),
             minLines = 2,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF4CAF50),
-                unfocusedBorderColor = Color(0xFFB0BEC5),
-                cursorColor = Color(0xFF1B5E20),
-                focusedLabelColor = Color(0xFF4CAF50)
+                focusedBorderColor = Color(0xFF2E7D32),
+                unfocusedBorderColor = Color(0xFF81C784),
+                cursorColor = Color(0xFF2E7D32),
+                focusedLabelColor = Color(0xFF2E7D32)
             )
         )
     }
@@ -868,7 +870,7 @@ fun SunnahSection(
             "Ibadah Sunnah:",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1B5E20)
+            color = Color(0xFF2E7D32)
         )
         Spacer(Modifier.height(8.dp))
         val sunnahItems: List<Pair<String, (Boolean) -> SunnahState>> = listOf(
@@ -917,14 +919,14 @@ fun SunnahSection(
                     text = name,
                     modifier = Modifier.weight(3f),
                     fontSize = 14.sp,
-                    color = Color(0xFF1B5E20)
+                    color = Color(0xFF2E7D32)
                 )
                 Checkbox(
                     checked = isChecked,
                     onCheckedChange = { newValue ->
                         onSunnahStateChange(updateState(newValue))
                     },
-                    colors = CheckboxDefaults.colors(checkedColor = Color(0xFF4CAF50))
+                    colors = CheckboxDefaults.colors(checkedColor = Color(0xFF2E7D32))
                 )
             }
         }
@@ -945,7 +947,7 @@ fun SyukurSection(
             "Hari ini aku bersyukur karena:",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF1B5E20)
+            color = Color(0xFF2E7D32)
         )
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
@@ -954,17 +956,17 @@ fun SyukurSection(
             placeholder = {
                 Text(
                     "Tulis rasa syukurmu hari ini...",
-                    color = Color(0xFFB0BEC5)
+                    color = Color(0xFF81C784)
                 )
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 100.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF4CAF50),
-                unfocusedBorderColor = Color(0xFFB0BEC5),
-                cursorColor = Color(0xFF1B5E20),
-                focusedLabelColor = Color(0xFF4CAF50)
+                focusedBorderColor = Color(0xFF2E7D32),
+                unfocusedBorderColor = Color(0xFF81C784),
+                cursorColor = Color(0xFF2E7D32),
+                focusedLabelColor = Color(0xFF2E7D32)
             )
         )
     }
