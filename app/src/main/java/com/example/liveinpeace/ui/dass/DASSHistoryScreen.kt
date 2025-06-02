@@ -30,6 +30,7 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.animation.Easing
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
@@ -204,76 +205,107 @@ fun DASSHistoryScreen(navController: NavController) {
 
 @Composable
 fun BarChartView(scores: List<DASSScore>) {
+    // State untuk trigger refresh animasi
+    var refreshKey by remember { mutableIntStateOf(0) }
+
+    // Trigger refresh ketika data scores berubah
+    LaunchedEffect(scores.size) {
+        refreshKey++
+    }
+
     AndroidView(
         factory = { context ->
             BarChart(context).apply {
-                val entriesDepression = scores.reversed().mapIndexed { index, score ->
-                    BarEntry(index.toFloat(), score.depressionScore.toFloat())
-                }
-                val entriesAnxiety = scores.reversed().mapIndexed { index, score ->
-                    BarEntry(index.toFloat() + 0.33f, score.anxietyScore.toFloat())
-                }
-                val entriesStress = scores.reversed().mapIndexed { index, score ->
-                    BarEntry(index.toFloat() + 0.66f, score.stressScore.toFloat())
-                }
+                // Konfigurasi dasar chart
+                description.isEnabled = false
+                legend.textColor = Color(0xFF333333).toArgb()
+                setFitBars(true)
+                extraBottomOffset = 10f
 
-                val dataSetDepression = BarDataSet(entriesDepression, "Depresi").apply {
-                    color = Color(0xFF2196F3).toArgb()
-                    valueTextColor = Color(0xFF333333).toArgb()
-                    valueTextSize = 10f
-                }
-                val dataSetAnxiety = BarDataSet(entriesAnxiety, "Kecemasan").apply {
-                    color = Color(0xFF4CAF50).toArgb()
-                    valueTextColor = Color(0xFF333333).toArgb()
-                    valueTextSize = 10f
-                }
-                val dataSetStress = BarDataSet(entriesStress, "Stres").apply {
-                    color = Color(0xFFF44336).toArgb()
-                    valueTextColor = Color(0xFF333333).toArgb()
-                    valueTextSize = 10f
-                }
-
-                val barData = BarData(dataSetDepression, dataSetAnxiety, dataSetStress).apply {
-                    barWidth = 0.3f // Lebar tiap batang
-                }
-
-                // Atur jarak antar grup batang, grup pertama lebih dekat ke 0
-                barData.groupBars(-0.3f, 0.1f, 0.02f) // start, groupSpace, barSpace
-
-                data = barData
-
+                // Konfigurasi X Axis
                 xAxis.apply {
                     position = XAxis.XAxisPosition.BOTTOM
-                    valueFormatter = object : ValueFormatter() {
-                        override fun getFormattedValue(value: Float): String {
-                            val index = value.toInt()
-                            return if (index in scores.indices) {
-                                formatTimestampShort(scores.reversed()[index].timestamp)
-                            } else ""
-                        }
-                    }
                     textColor = Color(0xFF333333).toArgb()
-                    textSize = 10f // Kecilkan ukuran teks
-//                    labelRotationAngle = 45f // Putar label 45 derajat
+                    textSize = 10f
                     granularity = 1f
                     setDrawGridLines(false)
-                    axisMinimum = -0.5f // Sesuaikan dengan start groupBars
-                    setCenterAxisLabels(true) // Pusatkan label di bawah grup batang
+                    axisMinimum = -0.5f
+                    setCenterAxisLabels(true)
                 }
 
+                // Konfigurasi Y Axis
                 axisLeft.apply {
                     textColor = Color(0xFF333333).toArgb()
                     axisMinimum = 0f
                     setDrawGridLines(true)
                 }
                 axisRight.isEnabled = false
-
-                description.isEnabled = false
-                legend.textColor = Color(0xFF333333).toArgb()
-                setFitBars(true)
-                extraBottomOffset = 10f // Tambah padding bawah biar label nggak kepotong
-                invalidate() // Refresh chart
             }
+        },
+        update = { chart ->
+            // Prepare data entries
+            val entriesDepression = scores.reversed().mapIndexed { index, score ->
+                BarEntry(index.toFloat(), score.depressionScore.toFloat())
+            }
+            val entriesAnxiety = scores.reversed().mapIndexed { index, score ->
+                BarEntry(index.toFloat() + 0.33f, score.anxietyScore.toFloat())
+            }
+            val entriesStress = scores.reversed().mapIndexed { index, score ->
+                BarEntry(index.toFloat() + 0.66f, score.stressScore.toFloat())
+            }
+
+            // Create datasets dengan konfigurasi warna
+            val dataSetDepression = BarDataSet(entriesDepression, "Depresi").apply {
+                color = Color(0xFF2196F3).toArgb() // Biru
+                valueTextColor = Color(0xFF333333).toArgb()
+                valueTextSize = 10f
+            }
+            val dataSetAnxiety = BarDataSet(entriesAnxiety, "Kecemasan").apply {
+                color = Color(0xFF4CAF50).toArgb() // Hijau
+                valueTextColor = Color(0xFF333333).toArgb()
+                valueTextSize = 10f
+            }
+            val dataSetStress = BarDataSet(entriesStress, "Stres").apply {
+                color = Color(0xFFF44336).toArgb() // Merah
+                valueTextColor = Color(0xFF333333).toArgb()
+                valueTextSize = 10f
+            }
+
+            // Set bar data dengan grouping
+            val barData = BarData(dataSetDepression, dataSetAnxiety, dataSetStress).apply {
+                barWidth = 0.3f // Lebar tiap batang
+            }
+
+            // Group bars untuk mengelompokkan 3 batang per data point
+            barData.groupBars(-0.3f, 0.1f, 0.02f) // start, groupSpace, barSpace
+
+            // Set data ke chart
+            chart.data = barData
+
+            // Update X-axis formatter
+            chart.xAxis.valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    val index = value.toInt()
+                    return if (index in scores.indices) {
+                        formatTimestampShort(scores.reversed()[index].timestamp)
+                    } else ""
+                }
+            }
+
+            // ANIMASI: Tambahkan animasi slide up dari bawah
+            chart.animateY(
+                1500, // Durasi animasi dalam milidetik (1.5 detik)
+                Easing.EaseInOutQuart // Easing function untuk animasi yang smooth
+            )
+
+            // Alternative animations yang bisa digunakan:
+            // chart.animateXY(1200, 1500) // Animasi dari X dan Y
+            // chart.animateY(1200, Easing.EaseInOutBack) // Dengan bounce effect
+            // chart.animateY(1000, Easing.EaseInOutCubic) // Lebih cepat dengan cubic easing
+            // chart.animateY(1800, Easing.EaseInOutElastic) // Dengan elastic effect
+
+            // Refresh chart
+            chart.invalidate()
         },
         modifier = Modifier
             .fillMaxWidth()

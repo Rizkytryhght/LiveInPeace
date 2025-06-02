@@ -32,6 +32,7 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.animation.Easing
 import kotlinx.coroutines.delay
 
 @Composable
@@ -232,37 +233,24 @@ fun MoodButton(
 
 @Composable
 fun MoodBarChart(moods: List<MoodEntry>) {
+    // State untuk trigger refresh animasi
+    var refreshKey by remember { mutableIntStateOf(0) }
+
+    // Trigger refresh ketika data moods berubah
+    LaunchedEffect(moods.size) {
+        refreshKey++
+    }
+
     AndroidView(
         factory = { context ->
             BarChart(context).apply {
-                val moodCounts = listOf("Marah", "Sedih", "Cemas", "Tenang", "Senang").mapIndexed { index, mood ->
-                    BarEntry(index.toFloat(), moods.count { it.mood == mood }.toFloat())
-                }
+                // Konfigurasi dasar chart
+                description.isEnabled = false
+                legend.isEnabled = false
+                setFitBars(true)
+                extraBottomOffset = 10f
 
-                // Calculate max frequency for Y-axis
-                val maxFrequency = moodCounts.maxOfOrNull { it.y.toInt() }?.toFloat() ?: 1f
-
-                val dataSet = BarDataSet(moodCounts, "Mood").apply {
-                    colors = listOf(
-                        Color(0xFFF44336).toArgb(),
-                        Color(0xFF2196F3).toArgb(),
-                        Color(0xFFFF9800).toArgb(),
-                        Color(0xFF4CAF50).toArgb(),
-                        Color(0xFFFFC107).toArgb()
-                    )
-                    valueTextColor = Color(0xFF333333).toArgb()
-                    valueTextSize = 10f
-                    valueFormatter = object : ValueFormatter() {
-                        override fun getFormattedValue(value: Float): String {
-                            return value.toInt().toString()
-                        }
-                    }
-                }
-
-                data = BarData(dataSet).apply {
-                    barWidth = 0.3f
-                }
-
+                // Konfigurasi X Axis
                 xAxis.apply {
                     position = XAxis.XAxisPosition.BOTTOM
                     valueFormatter = object : ValueFormatter() {
@@ -284,20 +272,63 @@ fun MoodBarChart(moods: List<MoodEntry>) {
                     labelRotationAngle = 0f
                 }
 
+                // Konfigurasi Y Axis
+                axisRight.isEnabled = false
                 axisLeft.apply {
                     textColor = Color(0xFF333333).toArgb()
                     axisMinimum = 0f
-                    axisMaximum = maxFrequency + 0.3f // Add padding for readability
                     setDrawGridLines(true)
                 }
-                axisRight.isEnabled = false
-
-                description.isEnabled = false
-                legend.isEnabled = false
-                setFitBars(true)
-                extraBottomOffset = 10f
-                invalidate()
             }
+        },
+        update = { chart ->
+            // Hitung data mood
+            val moodCounts = listOf("Marah", "Sedih", "Cemas", "Tenang", "Senang").mapIndexed { index, mood ->
+                BarEntry(index.toFloat(), moods.count { it.mood == mood }.toFloat())
+            }
+
+            // Hitung max frequency untuk Y-axis
+            val maxFrequency = moodCounts.maxOfOrNull { it.y.toInt() }?.toFloat() ?: 1f
+
+            // Buat dataset dengan konfigurasi warna dan format
+            val dataSet = BarDataSet(moodCounts, "Mood").apply {
+                colors = listOf(
+                    Color(0xFFF44336).toArgb(), // Marah - Merah
+                    Color(0xFF2196F3).toArgb(), // Sedih - Biru
+                    Color(0xFFFF9800).toArgb(), // Cemas - Orange
+                    Color(0xFF4CAF50).toArgb(), // Tenang - Hijau
+                    Color(0xFFFFC107).toArgb()  // Senang - Kuning
+                )
+                valueTextColor = Color(0xFF333333).toArgb()
+                valueTextSize = 10f
+                valueFormatter = object : ValueFormatter() {
+                    override fun getFormattedValue(value: Float): String {
+                        return if (value > 0) value.toInt().toString() else ""
+                    }
+                }
+            }
+
+            // Set data ke chart
+            chart.data = BarData(dataSet).apply {
+                barWidth = 0.3f
+            }
+
+            // Update Y-axis maximum
+            chart.axisLeft.axisMaximum = maxFrequency + 1f
+
+            // ANIMASI: Tambahkan animasi slide up dari bawah
+            chart.animateY(
+                1200, // Durasi animasi dalam milidetik (1.2 detik)
+                Easing.EaseInOutQuart // Easing function untuk animasi yang smooth
+            )
+
+            // Alternative animations yang bisa digunakan:
+            // chart.animateXY(1000, 1200) // Animasi dari X dan Y
+            // chart.animateY(1000, Easing.EaseInOutBack) // Dengan bounce effect
+            // chart.animateY(800, Easing.EaseInOutCubic) // Lebih cepat dengan cubic easing
+
+            // Refresh chart
+            chart.invalidate()
         },
         modifier = Modifier
             .fillMaxWidth()
