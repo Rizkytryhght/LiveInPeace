@@ -1,5 +1,7 @@
 package com.example.liveinpeace.ui.dass
 
+import android.app.Activity
+import android.content.Intent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -24,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.liveinpeace.data.repository.DASSRepository
+import com.example.liveinpeace.ui.features.FeaturesListActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
@@ -72,7 +75,22 @@ fun DASSOptionsScreen(navController: NavController) {
     ) {
         IconButton(
             onClick = {
-                navController.navigate("main") // Kembali ke MainActivity
+                println("Back button clicked")
+                try {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                        println("Popped back stack")
+                    } else {
+                        // Fallback: Start MainActivity and finish current
+                        context.startActivity(Intent(context, FeaturesListActivity::class.java))
+                        (context as? Activity)?.finish()
+                        println("Started MainActivity")
+                    }
+                } catch (e: Exception) {
+                    println("Navigation error: ${e.message}")
+                    // Last resort: Finish activity
+                    (context as? Activity)?.finish()
+                }
             },
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -87,6 +105,7 @@ fun DASSOptionsScreen(navController: NavController) {
                 modifier = Modifier.size(24.dp)
             )
         }
+    }
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -212,5 +231,4 @@ fun DASSOptionsScreen(navController: NavController) {
 //        }) {
 //            Text("Clear Room Data (Debug)")
 //        }
-    }
 }
