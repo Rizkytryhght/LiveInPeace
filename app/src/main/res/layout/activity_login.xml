@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    tools:ignore="ScrollViewCount">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -160,30 +162,31 @@
         </LinearLayout>
 
         <!-- Facebook Sign In Button -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:gravity="center"
-            android:background="@drawable/white_button_background"
-            android:padding="8dp"
-            android:layout_marginTop="8dp"
-            android:clickable="true"
-            android:focusable="true">
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="56dp"-->
+<!--            android:gravity="center"-->
+<!--            android:background="@drawable/white_button_background"-->
+<!--            android:padding="8dp"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:clickable="true"-->
+<!--            android:focusable="true">-->
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/facebook"
-                android:contentDescription="Facebook Logo"
-                android:layout_marginEnd="8dp"/>
+<!--&lt;!&ndash;            <ImageView&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_width="24dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_height="24dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:src="@drawable/facebook"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:contentDescription="Facebook Logo"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_marginEnd="8dp"/>&ndash;&gt;-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Continue with Facebook"
-                android:textSize="16sp"
-                android:textColor="@android:color/black"/>
-        </LinearLayout>
+<!--            &lt;!&ndash;            <TextView&ndash;&gt;-->
+<!--            &lt;!&ndash;                android:layout_width="wrap_content"&ndash;&gt;-->
+<!--            &lt;!&ndash;                android:layout_height="wrap_content"&ndash;&gt;-->
+<!--            &lt;!&ndash;                android:text="Continue with Facebook"&ndash;&gt;-->
+<!--            &lt;!&ndash;                android:textSize="16sp"&ndash;&gt;-->
+<!--            &lt;!&ndash;                android:textColor="@android:color/black"/>&ndash;&gt;-->
+
+<!--        </LinearLayout>-->
 
         <!-- Sign Up Text -->
         <TextView
