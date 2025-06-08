@@ -1,26 +1,26 @@
 [versions]
-agp = "8.8.0"
+agp = "8.8.2"
 kotlin = "2.0.0"
-coreKtx = "1.15.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.7"
+lifecycleRuntimeKtx = "2.9.1"
 activityCompose = "1.10.1"
-composeBom = "2024.04.01"
-appcompat = "1.7.0"
-firebase-auth = "23.2.0" # Pilih versi terbaru, hapus firebaseAuth
+composeBom = "2025.06.00"
+appcompat = "1.7.1"
+firebase-auth = "23.2.1" # Pilih versi terbaru, hapus firebaseAuth
 firebaseDatabase = "21.0.0"
 mpandroidchart = "v3.1.0"
-google-services = "4.4.1"
-navigation-compose = "2.8.9" # Pilih versi terbaru, hapus navigationCompose
+google-services = "4.4.2"
+navigation-compose = "2.9.0" # Pilih versi terbaru, hapus navigationCompose
 coil-compose = "2.6.0"
-room = "2.6.1"
+room = "2.7.1"
 retrofit = "2.11.0"
 material = "1.12.0"
-recyclerview = "1.3.2"
-datastore = "1.1.1"
-firebase-firestore = "25.1.0"
+recyclerview = "1.4.0"
+datastore = "1.1.7"
+firebase-firestore = "25.1.4"
 firebaseStorageKtx = "21.0.2"
 
 [libraries]
