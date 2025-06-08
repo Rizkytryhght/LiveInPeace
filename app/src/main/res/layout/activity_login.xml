@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="24dp"
-        android:background="#EFF0F6">
+        android:background="#FFFFFF">
 
         <!-- App Logo -->
         <ImageView
