@@ -189,7 +189,8 @@ fun LoginScreen(
             text = "Don't have an account? Sign Up",
             color = GreenPrimary,
             fontSize = 14.sp,
-            modifier = Modifier.clickable { onNavigateToRegister() }
+            modifier = Modifier.clickable { onNavigateToRegister() },
+            fontWeight = FontWeight.Bold
         )
 
         Spacer(modifier = Modifier.height(24.dp))

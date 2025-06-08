@@ -1,6 +1,7 @@
 package com.example.liveinpeace.viewModel
 
 import android.app.Activity
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import com.example.liveinpeace.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
