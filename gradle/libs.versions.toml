@@ -22,6 +22,7 @@ recyclerview = "1.4.0"
 datastore = "1.1.7"
 firebase-firestore = "25.1.4"
 firebaseStorageKtx = "21.0.2"
+runtimeLivedata = "1.8.2"
 
 [libraries]
 mpandroidchart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "mpandroidchart" }
@@ -54,6 +55,7 @@ datastore-preferences = { module = "androidx.datastore:datastore-preferences", v
 firebase-firestore = { module = "com.google.firebase:firebase-firestore", version.ref = "firebase-firestore" }
 firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx", version.ref = "firebase-firestore" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

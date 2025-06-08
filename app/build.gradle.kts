@@ -79,6 +79,7 @@ dependencies {
     // Hilt untuk Dependency Injection
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     implementation("com.google.dagger:hilt-android:2.51")
+    implementation(libs.androidx.runtime.livedata)
     kapt("com.google.dagger:hilt-android-compiler:2.51")
 
     // Firebase (menggunakan BOM untuk konsistensi versi)

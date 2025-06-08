@@ -212,8 +212,8 @@ fun AccountSettingsCard(
 @Composable
 fun BottomNavigationBar(currentRoute: String, onNavigate: (String) -> Unit) {
     Surface(
-        tonalElevation = 8.dp,
-        shadowElevation = 8.dp,
+//        tonalElevation = 8.dp,
+//        shadowElevation = 8.dp,
         shape = RoundedCornerShape(topStart = 36.dp, topEnd = 36.dp),
     ) {
         NavigationBar(
