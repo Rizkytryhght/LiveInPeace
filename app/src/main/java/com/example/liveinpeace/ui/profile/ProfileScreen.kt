@@ -66,6 +66,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.ui.layout.ContentScale
 import com.example.liveinpeace.ui.theme.GreenPrimary
 import kotlinx.coroutines.delay
 
@@ -292,6 +293,7 @@ fun ProfileImageWithAnimation(imageFile: File?) {
         Image(
             painter = painter,
             contentDescription = "Profile Image",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
