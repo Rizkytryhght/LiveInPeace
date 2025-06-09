@@ -100,18 +100,7 @@ fun NotesScreen(
     ) {
         Scaffold(
             bottomBar = {
-                AnimatedVisibility(
-                    visible = isVisible,
-                    enter = slideInVertically(
-                        initialOffsetY = { it },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessLow
-                        )
-                    )
-                ) {
                     BottomNavigationBar(context = context)
-                }
             },
             floatingActionButton = {
                 AnimatedVisibility(

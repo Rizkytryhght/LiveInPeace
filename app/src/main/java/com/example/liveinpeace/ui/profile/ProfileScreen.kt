@@ -1,7 +1,18 @@
 package com.example.liveinpeace.ui.profile
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +21,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,11 +37,19 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -47,6 +67,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import com.example.liveinpeace.ui.theme.GreenPrimary
+import kotlinx.coroutines.delay
 
 @Composable
 fun ProfileScreen(
@@ -61,49 +82,110 @@ fun ProfileScreen(
         if (profile.profileImagePath.isNotBlank()) File(profile.profileImagePath) else null
     }
 
+    var isVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(100)
+        isVisible = true
+    }
+
     Scaffold(
         bottomBar = {
             BottomNavigationBar(currentRoute = currentRoute, onNavigate = onNavigate)
         },
-        containerColor = GreenPrimary
+        containerColor = Color.Transparent
     ) { innerPadding ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .padding(10.dp)
-        ) {
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Profile",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            GreenPrimary,
+                            Color(0xFF6B9C68),
+                            GreenPrimary
+                        )
                     )
+                )
+        ) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(16.dp)
+            ) {
+                item {
+                    AnimatedVisibility(
+                        visible = isVisible,
+                        enter = fadeIn(animationSpec = tween(800)) +
+                                slideInVertically(
+                                    initialOffsetY = { -100 },
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                                        stiffness = Spring.StiffnessLow
+                                    )
+                                )
+                    ) {
+                        Column {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = "Profile",
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                )
+                            }
+
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 20.dp),
+                                thickness = 2.dp,
+                                color = Color.White.copy(alpha = 0.8f)
+                            )
+                        }
+                    }
                 }
 
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    thickness = 2.dp,
-                    color = Color.White
-                )
-            }
+                item {
+                    AnimatedVisibility(
+                        visible = isVisible,
+                        enter = fadeIn(animationSpec = tween(1000, delayMillis = 200)) +
+                                slideInVertically(
+                                    initialOffsetY = { 200 },
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                                        stiffness = Spring.StiffnessLow
+                                    )
+                                )
+                    ) {
+                        ProfileCard(profile, imageFile, onEditClick)
+                    }
+                }
 
-            item {
-                ProfileCard(profile, imageFile, onEditClick)
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-                AccountSettingsCard(Modifier, onLogoutClick)
+                item {
+                    AnimatedVisibility(
+                        visible = isVisible,
+                        enter = fadeIn(animationSpec = tween(1000, delayMillis = 400)) +
+                                slideInVertically(
+                                    initialOffsetY = { 150 },
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                                        stiffness = Spring.StiffnessLow
+                                    )
+                                )
+                    ) {
+                        Column {
+                            Spacer(modifier = Modifier.height(24.dp))
+                            AccountSettingsCard(Modifier, onLogoutClick)
+                        }
+                    }
+                }
             }
         }
     }
@@ -115,56 +197,237 @@ fun ProfileCard(
     imageFile: File?,
     onEditClick: () -> Unit
 ) {
+    val isPressed by remember { mutableStateOf(false) }
+    val cardScale by animateFloatAsState(
+        targetValue = if (isPressed) 0.98f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "cardScale"
+    )
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(10.dp, RoundedCornerShape(16.dp)),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+            .scale(cardScale)
+            .shadow(
+                elevation = 20.dp,
+                shape = RoundedCornerShape(20.dp),
+                spotColor = Color.Black.copy(alpha = 0.25f)
+            ),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White.copy(alpha = 0.95f)
+        )
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.Start // agar teks dan info label rata kiri
+            modifier = Modifier.padding(28.dp),
+            horizontalAlignment = Alignment.Start
         ) {
-            // Center foto profil
+            // Profile Image with Animation
             Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                val painter = rememberAsyncImagePainter(
-                    model = imageFile ?: R.drawable.user
-                )
-                Image(
-                    painter = painter,
-                    contentDescription = "Profile Image",
-                    modifier = Modifier
-                        .size(90.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, Color.White, CircleShape)
-                )
+                ProfileImageWithAnimation(imageFile)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Info rata kiri
-            InfoLabel("Nama", "${profile.firstName} ${profile.lastName}")
-            InfoLabel("Email", profile.email)
-            InfoLabel("Jenis Kelamin", profile.gender ?: "Tidak ditentukan")
-            InfoLabel("Nomor Telepon", profile.phoneNumber ?: "Tidak ditentukan")
+            // Animated Info Labels
+            AnimatedInfoSection(profile)
 
-            IconButton(onClick = onEditClick, modifier = Modifier.align(Alignment.End)) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Color.Black)
+            // Animated Edit Button
+            AnimatedEditButton(onEditClick)
+        }
+    }
+}
+
+@Composable
+fun ProfileImageWithAnimation(imageFile: File?) {
+    var imageLoaded by remember { mutableStateOf(false) }
+    val imageScale by animateFloatAsState(
+        targetValue = if (imageLoaded) 1f else 0.8f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "imageScale"
+    )
+    val imageAlpha by animateFloatAsState(
+        targetValue = if (imageLoaded) 1f else 0f,
+        animationSpec = tween(800),
+        label = "imageAlpha"
+    )
+
+    LaunchedEffect(Unit) {
+        delay(800)
+        imageLoaded = true
+    }
+
+    Box(
+        modifier = Modifier
+            .size(110.dp)
+            .scale(imageScale)
+            .alpha(imageAlpha)
+    ) {
+        // Outer glow effect
+        Box(
+            modifier = Modifier
+                .size(110.dp)
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(
+                            GreenPrimary.copy(alpha = 0.0f),
+                            Color.Transparent
+                        ),
+                        radius = 60f
+                    ),
+                    shape = CircleShape
+                )
+                .clip(CircleShape)
+        )
+
+        val painter = rememberAsyncImagePainter(
+            model = imageFile ?: R.drawable.user
+        )
+        Image(
+            painter = painter,
+            contentDescription = "Profile Image",
+            modifier = Modifier
+                .size(100.dp)
+                .clip(CircleShape)
+                .border(3.dp, Color.White, CircleShape)
+                .align(Alignment.Center)
+        )
+    }
+}
+
+@Composable
+fun AnimatedInfoSection(profile: ProfileModel) {
+    val infoItems = listOf(
+        "Nama" to "${profile.firstName} ${profile.lastName}",
+        "Email" to profile.email,
+        "Jenis Kelamin" to profile.gender.ifBlank { "Tidak ditentukan" },
+        "Nomor Telepon" to profile.phoneNumber.ifBlank { "Tidak ditentukan" }
+    )
+
+    var isVisible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(800)
+        isVisible = true
+    }
+
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = fadeIn(animationSpec = tween(800)) +
+                slideInVertically(
+                    initialOffsetY = { 80 },
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+                )
+    ) {
+        Column {
+            infoItems.forEach { (label, value) ->
+                AnimatedInfoLabel(label, value)
             }
         }
     }
 }
 
 @Composable
-fun InfoLabel(label: String, value: String) {
-    Column(modifier = Modifier.padding(bottom = 12.dp)) {
-        Text(text = label, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFF82A67D))
-        Text(text = value, fontSize = 16.sp, color = Color.Black)
+fun AnimatedInfoLabel(label: String, value: String) {
+    Column(
+        modifier = Modifier
+            .padding(bottom = 16.dp)
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = label,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = GreenPrimary,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        Text(
+            text = value,
+            fontSize = 16.sp,
+            color = Color.Black.copy(alpha = 0.8f),
+            fontWeight = FontWeight.Medium
+        )
+    }
+}
+
+@Composable
+fun AnimatedEditButton(onEditClick: () -> Unit) {
+    var buttonVisible by remember { mutableStateOf(false) }
+    var isPressed by remember { mutableStateOf(false) }
+
+    val buttonScale by animateFloatAsState(
+        targetValue = if (isPressed) 0.9f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "buttonScale"
+    )
+    val buttonRotation by animateFloatAsState(
+        targetValue = if (isPressed) 15f else 0f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "buttonRotation"
+    )
+
+    LaunchedEffect(Unit) {
+        delay(800)
+        buttonVisible = true
+    }
+    AnimatedVisibility(
+        visible = buttonVisible,
+        enter = fadeIn(animationSpec = tween(800)) +
+                slideInVertically(
+                    initialOffsetY = { 80 },
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+                )
+    ) {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.CenterEnd
+        ) {
+            IconButton(
+                onClick = onEditClick,
+                modifier = Modifier
+                    .scale(buttonScale)
+                    .rotate(buttonRotation)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        isPressed = !isPressed
+                        onEditClick()
+                    }
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(GreenPrimary, Color(0xFF6B9C68))
+                            ),
+                            shape = CircleShape
+                        )
+                        .clip(CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = "Edit",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -173,6 +436,13 @@ fun AccountSettingsCard(
     modifier: Modifier = Modifier,
     onLogoutClick: () -> Unit
 ) {
+    var isPressed by remember { mutableStateOf(false) }
+    val cardScale by animateFloatAsState(
+        targetValue = if (isPressed) 0.95f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = "logoutCardScale"
+    )
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -180,29 +450,40 @@ fun AccountSettingsCard(
     ) {
         Card(
             modifier = Modifier
-                .align(Alignment.BottomEnd) // pojok kanan bawah
-                .wrapContentSize(), // agar ukuran kecil
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFD32F2F)), // merah
-            elevation = CardDefaults.cardElevation(4.dp),
+                .align(Alignment.BottomEnd)
+                .wrapContentSize()
+                .scale(cardScale)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    isPressed = !isPressed
+                    onLogoutClick()
+                },
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFE53E3E)
+            ),
+            elevation = CardDefaults.cardElevation(8.dp),
             onClick = onLogoutClick
         ) {
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.exit),
                     contentDescription = "Logout",
                     modifier = Modifier.size(20.dp),
-                    tint = Color.White // ikon putih
+                    tint = Color.White
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "Logout",
                     fontSize = 14.sp,
-                    color = Color.White // teks putih
+                    fontWeight = FontWeight.Medium,
+                    color = Color.White
                 )
             }
         }
@@ -212,15 +493,13 @@ fun AccountSettingsCard(
 @Composable
 fun BottomNavigationBar(currentRoute: String, onNavigate: (String) -> Unit) {
     Surface(
-//        tonalElevation = 8.dp,
-//        shadowElevation = 8.dp,
         shape = RoundedCornerShape(topStart = 36.dp, topEnd = 36.dp),
     ) {
         NavigationBar(
             containerColor = Color.White,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(100.dp) // Atur tinggi sesuai kebutuhan
+                .height(100.dp)
         ) {
             val items = listOf(
                 NavItem("Catatan", R.drawable.ic_note, "notes"),
