@@ -626,23 +626,13 @@ fun EmptyNotesAnimation() {
 @Composable
 private fun BottomNavigationBar(context: Context) {
     Surface(
-        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
-        shadowElevation = 16.dp,
-        modifier = Modifier.clip(RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp))
+        shape = RoundedCornerShape(topStart = 36.dp, topEnd = 36.dp),
     ) {
         NavigationBar(
-            containerColor = Color.White,
+            containerColor = Color(0xFFFFFFFF),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(90.dp)
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color.White,
-                            Color.White.copy(alpha = 0.98f)
-                        )
-                    )
-                )
+                .height(100.dp)
         ) {
             val items = listOf(
                 NavItem("Catatan", R.drawable.ic_note, "notes"),
@@ -651,10 +641,8 @@ private fun BottomNavigationBar(context: Context) {
             )
 
             items.forEach { item ->
-                val selected = item.route == "notes"
-
                 NavigationBarItem(
-                    selected = selected,
+                    selected = item.route == "notes", // Always selected for notes
                     onClick = {
                         when(item.route) {
                             "features" -> {
@@ -676,36 +664,25 @@ private fun BottomNavigationBar(context: Context) {
                         }
                     },
                     icon = {
-                        Box(
-                            modifier = Modifier
-                                .size(if (selected) 28.dp else 24.dp)
-                                .background(
-                                    if (selected) GreenPrimary.copy(alpha = 0.1f) else Color.Transparent,
-                                    CircleShape
-                                )
-                                .padding(4.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                painter = painterResource(id = item.icon),
-                                contentDescription = item.title,
-                                modifier = Modifier.size(if (selected) 22.dp else 20.dp),
-                                tint = if (selected) GreenPrimary else Color.Gray.copy(alpha = 0.6f)
-                            )
-                        }
+                        Icon(
+                            painter = painterResource(id = item.icon),
+                            contentDescription = item.title,
+                            modifier = Modifier.size(20.dp),
+                            tint = if (item.route == "notes") GreenPrimary else Color.Gray
+                        )
                     },
                     label = {
                         Text(
                             text = item.title,
-                            fontSize = 11.sp,
-                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-                            color = if (selected) GreenPrimary else Color.Gray.copy(alpha = 0.6f)
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = if (item.route == "notes") GreenPrimary else Color.Gray
                         )
                     },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = GreenPrimary,
                         selectedTextColor = GreenPrimary,
-                        indicatorColor = Color.Transparent,
+                        indicatorColor = Color(0xFFADEAA5),
                         unselectedIconColor = Color.Gray,
                         unselectedTextColor = Color.Gray
                     )
