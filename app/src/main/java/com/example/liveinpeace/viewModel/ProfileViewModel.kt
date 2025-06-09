@@ -10,13 +10,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.File
 
 class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() {
     private val _profileState = MutableStateFlow(ProfileModel())
     val profileState: StateFlow<ProfileModel> = _profileState.asStateFlow()
     private val tag = "ProfileViewModel"
 
-    private var imageUri: Uri? = null // tambahan internal untuk simpan sementara URI
+    private var imageUri: Uri? = null
 
     init {
         loadProfile()
@@ -119,11 +120,43 @@ class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() 
     fun logout() {
         viewModelScope.launch {
             try {
+                val currentImagePath = _profileState.value.profileImagePath
+
+                // Clear all profile data from Room and Firestore session
                 repository.clearProfileData()
-                _profileState.value = ProfileModel()
-                Log.d(tag, "Logout berhasil, profil dan Room DB di-reset.")
+
+                // Reset profile but keep image path if exists
+                _profileState.value = ProfileModel(
+                    profileImagePath = if (currentImagePath.isNotEmpty() &&
+                        File(currentImagePath).exists()) {
+                        currentImagePath
+                    } else {
+                        ""
+                    }
+                )
+
+                Log.d(tag, "Logout berhasil, profil di-reset dengan mempertahankan foto.")
             } catch (e: Exception) {
                 Log.e(tag, "Gagal logout: ${e.message}", e)
+            }
+        }
+    }
+
+    fun restoreProfileImageAfterLogin() {
+        viewModelScope.launch {
+            try {
+                val currentProfile = _profileState.value
+                if (currentProfile.profileImagePath.isEmpty()) {
+                    // Try to sync from Firestore to get image
+                    val syncedProfile = repository.syncProfileFromFirestore()
+                    if (syncedProfile.profileImagePath.isNotEmpty()) {
+                        _profileState.value = currentProfile.copy(
+                            profileImagePath = syncedProfile.profileImagePath
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(tag, "Gagal restore foto profil: ${e.message}", e)
             }
         }
     }

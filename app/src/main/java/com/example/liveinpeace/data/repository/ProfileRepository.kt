@@ -58,12 +58,17 @@ class ProfileRepository(private val context: Context) {
 
         val uid = user.uid
         Log.d(tag, "Sinkronisasi profil dari Firestore untuk UID: $uid")
+
         return try {
             val document = db.collection("users").document(uid).get().await()
             if (document.exists()) {
                 val profileImageUrl = document.getString("profileImageUrl") ?: ""
-                var localImagePath = ""
-                if (profileImageUrl.isNotEmpty()) {
+
+                // Check if we already have local image
+                var localImagePath = getProfileImagePath(uid)
+
+                // If no local image but Firestore has URL, download it
+                if (localImagePath.isEmpty() && profileImageUrl.isNotEmpty()) {
                     try {
                         val file = File(context.filesDir, "profile_image_${uid}.jpg")
                         withContext(Dispatchers.IO) {
@@ -88,6 +93,7 @@ class ProfileRepository(private val context: Context) {
                     phoneNumber = document.getString("phoneNumber") ?: "",
                     profileImagePath = localImagePath
                 )
+
                 Log.d(tag, "Data dari Firestore: $profile")
                 if (profile.email.isNotEmpty()) {
                     saveProfile(profile)
@@ -177,12 +183,23 @@ class ProfileRepository(private val context: Context) {
     }
 
     suspend fun clearProfileData() {
-        profileDao.clearProfile()
-        val user = auth.currentUser
-        val file = File(context.filesDir, "profile_image_${user?.uid}.jpg")
-        if (file.exists()) {
-            file.delete()
-            Log.d(tag, "File foto dihapus: ${file.absolutePath}")
+        try {
+            // Clear Room database
+            profileDao.clearProfile()
+            Log.d(tag, "Room database cleared")
+        } catch (e: Exception) {
+            Log.e(tag, "Gagal clear profile data: ${e.message}", e)
         }
+    }
+
+    suspend fun hasLocalProfileImage(): Boolean {
+        val user = auth.currentUser ?: return false
+        val file = File(context.filesDir, "profile_image_${user.uid}.jpg")
+        return file.exists()
+    }
+
+    private fun getProfileImagePath(uid: String): String {
+        val file = File(context.filesDir, "profile_image_${uid}.jpg")
+        return if (file.exists()) file.absolutePath else ""
     }
 }
