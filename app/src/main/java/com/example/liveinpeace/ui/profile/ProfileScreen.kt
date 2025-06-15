@@ -35,7 +35,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -251,16 +250,16 @@ fun LogoutConfirmationDialog(
             }
         },
         dismissButton = {
-            OutlinedButton(
+            Button(
                 onClick = onDismiss,
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = GreenPrimary
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = GreenPrimary
                 ),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
                     text = "Batal",
-                    color = GreenPrimary,
+                    color = Color.White,
                     fontWeight = FontWeight.Medium
                 )
             }

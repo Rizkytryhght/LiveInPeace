@@ -36,7 +36,7 @@ class AuthRepository {
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(context, gso)
-        Log.d(tag, "Google Sign-In initialized")
+        Log.d(tag, "Google Sign-In initialized with account picker")
     }
 
     // Get Google Sign-In client
@@ -122,10 +122,16 @@ class AuthRepository {
         // Sign out from Firebase
         auth.signOut()
 
-        // Sign out from Google
+        // Sign out from Google and clear cached account
         googleSignInClient?.signOut()?.addOnCompleteListener {
-            Log.d(tag, "Signed out from Google and Firebase")
-            onComplete()
+            // Optionally revoke access to fully clear the session
+            googleSignInClient?.revokeAccess()?.addOnCompleteListener {
+                Log.d(tag, "Signed out from Google and Firebase, access revoked")
+                onComplete()
+            } ?: run {
+                Log.d(tag, "Signed out from Google and Firebase")
+                onComplete()
+            }
         } ?: run {
             Log.d(tag, "Signed out from Firebase only")
             onComplete()
