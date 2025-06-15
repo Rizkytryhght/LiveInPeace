@@ -31,10 +31,12 @@ class OnboardingAdapter(private val onboardingItems: List<OnboardingItem>) :
     inner class OnboardingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val imageOnboarding = view.findViewById<ImageView>(R.id.imageOnboarding)
         private val textTitle = view.findViewById<TextView>(R.id.textTitle)
+        private val textDescription = view.findViewById<TextView>(R.id.textDescription)
 
         fun bind(onboardingItem: OnboardingItem) {
             imageOnboarding.setImageResource(onboardingItem.imageRes)
             textTitle.text = onboardingItem.title
+            textDescription.text = onboardingItem.description
         }
     }
 }

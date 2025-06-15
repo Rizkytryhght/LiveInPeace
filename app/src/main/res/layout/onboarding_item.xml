@@ -46,7 +46,6 @@
         android:id="@+id/textDescription"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Catat perasaanmu, curhat secara pribadi, dan temukan pola emosimu melalui tulisan."
         android:textSize="20sp"
         android:textColor="@android:color/darker_gray"
         android:textAlignment="center"
@@ -55,6 +54,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 <!--    <TextView-->
+    <!--android:text="Catat perasaanmu, curhat secara pribadi, dan temukan pola emosimu melalui tulisan."-->
 <!--        android:id="@+id/textTitle"-->
 <!--        android:layout_width="0dp"-->
 <!--        android:layout_height="wrap_content"-->

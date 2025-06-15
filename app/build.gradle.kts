@@ -138,6 +138,7 @@ dependencies {
 
     // Google Play Services
     implementation("com.google.android.gms:play-services-base:18.5.0")
+    implementation ("com.google.android.gms:play-services-auth:20.7.0")
 
     // Desugaring untuk backward compatibility
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")

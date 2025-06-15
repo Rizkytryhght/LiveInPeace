@@ -7,4 +7,9 @@
     <string name="judul_onboarding_1">Meditasi Islami untuk Ketenangan</string>
     <string name="judul_onboarding_2">Temukan Kedamaian Diri</string>
     <string name="judul_onboarding_3">Hidup dalam Ketentraman</string>
+
+    <!-- Onboarding descriptions -->
+    <string name="deskripsi_onboarding_1">Rasakan ketenangan jiwa melalui dzikir dan meditasi yang sesuai dengan ajaran Islam untuk menenangkan hati dan pikiran.</string>
+    <string name="deskripsi_onboarding_2">Temukan kedamaian dalam diri dengan berbagai teknik relaksasi dan refleksi yang akan membawa ketenangan dalam hidup sehari-hari.</string>
+    <string name="deskripsi_onboarding_3">Wujudkan kehidupan yang tentram dan penuh berkah dengan menerapkan nilai-nilai spiritualitas dalam setiap aktivitas harian.</string>
 </resources>

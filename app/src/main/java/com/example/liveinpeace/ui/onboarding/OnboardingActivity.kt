@@ -33,15 +33,18 @@ class OnboardingActivity : AppCompatActivity() {
             listOf(
                 OnboardingItem(
                     R.drawable.onboarding1,
-                    getString(R.string.judul_onboarding_1)
+                    getString(R.string.judul_onboarding_1),
+                    getString(R.string.deskripsi_onboarding_1)
                 ),
                 OnboardingItem(
                     R.drawable.onboarding2,
-                    getString(R.string.judul_onboarding_2)
+                    getString(R.string.judul_onboarding_2),
+                    getString(R.string.deskripsi_onboarding_2)
                 ),
                 OnboardingItem(
                     R.drawable.onboarding3,
-                    getString(R.string.judul_onboarding_3)
+                    getString(R.string.judul_onboarding_3),
+                    getString(R.string.deskripsi_onboarding_3)
                 )
             )
         )
