@@ -73,22 +73,20 @@ fun DASSOptionsScreen(navController: NavController) {
             .background(gradient)
             .padding(16.dp)
     ) {
+        // Tombol Back yang diperbaiki - langsung ke FeaturesListActivity
         IconButton(
             onClick = {
-                println("Back button clicked")
                 try {
-                    if (navController.previousBackStackEntry != null) {
-                        navController.popBackStack()
-                        println("Popped back stack")
-                    } else {
-                        // Fallback: Start MainActivity and finish current
-                        context.startActivity(Intent(context, FeaturesListActivity::class.java))
-                        (context as? Activity)?.finish()
-                        println("Started MainActivity")
+                    // Langsung start FeaturesListActivity dan finish current activity
+                    val intent = Intent(context, FeaturesListActivity::class.java).apply {
+                        // Clear task stack dan buat FeaturesListActivity sebagai root
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     }
+                    context.startActivity(intent)
+                    (context as? Activity)?.finish()
                 } catch (e: Exception) {
-                    println("Navigation error: ${e.message}")
-                    // Last resort: Finish activity
+                    println("Error navigating back to Features: ${e.message}")
+                    // Fallback jika ada error
                     (context as? Activity)?.finish()
                 }
             },
@@ -100,12 +98,11 @@ fun DASSOptionsScreen(navController: NavController) {
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Kembali",
+                contentDescription = "Kembali ke Features",
                 tint = Color(0xFF4CAF50),
                 modifier = Modifier.size(24.dp)
             )
         }
-    }
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -224,6 +221,8 @@ fun DASSOptionsScreen(navController: NavController) {
                 }
             }
         }
+    }
+}
 //        Button(onClick = {
 //            coroutineScope.launch {
 //                repository.clearAllScores()
@@ -231,4 +230,4 @@ fun DASSOptionsScreen(navController: NavController) {
 //        }) {
 //            Text("Clear Room Data (Debug)")
 //        }
-}
+//}
