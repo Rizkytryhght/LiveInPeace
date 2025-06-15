@@ -76,7 +76,7 @@ fun FeaturesScreen(
                     visible = headerVisible,
                     enter = slideInVertically(
                         initialOffsetY = { -it },
-                        animationSpec = tween(600, easing = FastOutSlowInEasing)
+                        animationSpec = tween(800, easing = FastOutSlowInEasing)
                     ) + fadeIn(animationSpec = tween(600))
                 ) {
                     Column {

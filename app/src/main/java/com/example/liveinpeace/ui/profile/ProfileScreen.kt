@@ -2,7 +2,6 @@ package com.example.liveinpeace.ui.profile
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -21,7 +20,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,11 +27,15 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -84,10 +87,24 @@ fun ProfileScreen(
     }
 
     var isVisible by remember { mutableStateOf(false) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         delay(100)
         isVisible = true
+    }
+
+    // Dialog konfirmasi logout
+    if (showLogoutDialog) {
+        LogoutConfirmationDialog(
+            onConfirm = {
+                showLogoutDialog = false
+                onLogoutClick()
+            },
+            onDismiss = {
+                showLogoutDialog = false
+            }
+        )
     }
 
     Scaffold(
@@ -183,13 +200,74 @@ fun ProfileScreen(
                     ) {
                         Column {
                             Spacer(modifier = Modifier.height(24.dp))
-                            AccountSettingsCard(Modifier, onLogoutClick)
+                            AccountSettingsCard(
+                                modifier = Modifier,
+                                onLogoutClick = { showLogoutDialog = true }
+                            )
                         }
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+fun LogoutConfirmationDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "Konfirmasi Logout",
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                fontSize = 18.sp
+            )
+        },
+        text = {
+            Text(
+                text = "Apakah Anda yakin ingin keluar?",
+                color = Color.Black.copy(alpha = 0.8f),
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFE53E3E)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = "Ya, Logout",
+                    color = Color.White,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        },
+        dismissButton = {
+            OutlinedButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = GreenPrimary
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = "Batal",
+                    color = GreenPrimary,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        },
+        containerColor = Color.White,
+        shape = RoundedCornerShape(16.dp)
+    )
 }
 
 @Composable

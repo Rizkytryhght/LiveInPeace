@@ -12,7 +12,20 @@
           "package_name": "com.example.liveinpeace"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1064631648244-npup271d949782nsik6453385700ngq9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.liveinpeace",
+            "certificate_hash": "6c663c5d5490c5f7c00dd2502ac4b50ba7fab343"
+          }
+        },
+        {
+          "client_id": "1064631648244-942acv18q4mhav6dbjefj7u5qheo5949.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDlYg6Cj3RuFyRbESAtVGLmy5gg1Qt2abk"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1064631648244-942acv18q4mhav6dbjefj7u5qheo5949.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
