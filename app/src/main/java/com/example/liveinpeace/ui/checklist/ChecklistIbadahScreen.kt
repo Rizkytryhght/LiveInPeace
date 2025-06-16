@@ -481,6 +481,7 @@ fun Header(
     }
 }
 
+@SuppressLint("UseOfNonLambdaOffsetOverload")
 @Composable
 fun DatePickerSection(
     selectedDate: String,
